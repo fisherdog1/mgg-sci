@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Person
 {
-	private String legacyId;
+	private LegacyID legacyId;
 	private String firstName;
 	private String lastName;
 	private CustomerType type;
@@ -19,7 +19,7 @@ public class Person
 	private List<String> email;
 	
 	public Person(String legacyId, String firstName, String lastName, CustomerType type, StreetAddress address) {
-		this.legacyId = legacyId;
+		this.legacyId = new LegacyID(legacyId);
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.type = type;
@@ -32,12 +32,8 @@ public class Person
 		this(legacyId, "Polly", "Placeholder", CustomerType.Customer, new StreetAddress());
 	}
 	
-	public String getLegacyId()	{
+	public LegacyID getLegacyId() {
 		return legacyId;
-	}
-	
-	public void setLegacyId(String legacyId) {
-		this.legacyId = legacyId;
 	}
 	
 	public String getFirstName()	{

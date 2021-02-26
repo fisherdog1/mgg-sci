@@ -1,0 +1,72 @@
+[
+  {
+    "legacyId": {
+      "id": "beef01"
+    },
+    "firstName": "Polly",
+    "lastName": "Placematt",
+    "type": "Employee",
+    "address": {
+      "street": "105 Saijetska Ave.",
+      "city": "Omaha",
+      "state": "NE",
+      "zip": "68116",
+      "country": "US"
+    },
+    "email": [
+      "pplacematt@gmail.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "f00b10"
+    },
+    "firstName": "Johnny",
+    "lastName": "Tables",
+    "type": "Gold",
+    "address": {
+      "street": "100% \"D~ngerous\u0026^\" $treet",
+      "city": "Paloma",
+      "state": "WA",
+      "zip": "12321",
+      "country": "US"
+    },
+    "email": [
+      "jtables@localhost:80"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "b00fe7"
+    },
+    "firstName": " Leadingspaces",
+    "lastName": " Larry",
+    "type": "Platinum",
+    "address": {
+      "street": " 430 Microsoft Plaza",
+      "city": "Cupertino",
+      "state": "CA",
+      "zip": "45201",
+      "country": "US"
+    },
+    "email": []
+  },
+  {
+    "legacyId": {
+      "id": "00ff74"
+    },
+    "firstName": "Sally",
+    "lastName": "Standart",
+    "type": "Employee",
+    "address": {
+      "street": "255 Picadilly Cir",
+      "city": "Kirksville",
+      "state": "MO",
+      "zip": "64032",
+      "country": "US"
+    },
+    "email": [
+      "sstandart@costco.com"
+    ]
+  }
+]

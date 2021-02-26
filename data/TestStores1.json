@@ -1,0 +1,47 @@
+[
+  {
+    "legacyId": {
+      "id": "f3671a"
+    },
+    "managerId": {
+      "id": "beef01"
+    },
+    "address": {
+      "street": "1 Polygon Plaza",
+      "city": "Cupertino",
+      "state": "CA",
+      "zip": "45201",
+      "country": "US"
+    }
+  },
+  {
+    "legacyId": {
+      "id": "fff45e"
+    },
+    "managerId": {
+      "id": "00ff74"
+    },
+    "address": {
+      "street": "1 Nothing Wrong With Me",
+      "city": "Caldera",
+      "state": "WY",
+      "zip": "12708",
+      "country": "US"
+    }
+  },
+  {
+    "legacyId": {
+      "id": "f3fff3"
+    },
+    "managerId": {
+      "id": "123abc"
+    },
+    "address": {
+      "street": "7 Agile Parkway",
+      "city": "Maryville",
+      "state": "MO",
+      "zip": "80451",
+      "country": "US"
+    }
+  }
+]

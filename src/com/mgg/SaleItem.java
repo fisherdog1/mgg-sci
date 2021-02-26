@@ -2,15 +2,15 @@ package com.mgg;
 
 public class SaleItem
 {
-	private String legacyId;
+	private LegacyID legacyId;
 	private String name;
 	
 	public SaleItem(String legacyId, String name) {
-		this.legacyId = legacyId;
+		this.legacyId = new LegacyID(legacyId);
 		this.name = name;
 	}
 	
-	public String getLegacyId()	{
+	public LegacyID getLegacyId() {
 		return this.legacyId;
 	}
 	

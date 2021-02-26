@@ -1,0 +1,241 @@
+[
+  {
+    "legacyId": {
+      "id": "fdc267"
+    },
+    "firstName": "Staci",
+    "lastName": "Quarry",
+    "type": "Employee",
+    "address": {
+      "street": "601 Lotheville Road",
+      "city": "Savannah",
+      "state": "GA",
+      "zip": "31405",
+      "country": "US"
+    },
+    "email": [
+      "squarry0@reverbnation.com",
+      "squarry0@salon.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "0375b6"
+    },
+    "firstName": "Nonnah",
+    "lastName": "Michelotti",
+    "type": "Employee",
+    "address": {
+      "street": "0 Havey Avenue",
+      "city": "Cleveland",
+      "state": "OH",
+      "zip": "44177",
+      "country": "US"
+    },
+    "email": [
+      "nmichelotti1@sbwire.com",
+      "nmichelotti1@vistaprint.com",
+      "nmichelotti1@gravatar.com",
+      "nmichelotti1@patch.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "aa887a"
+    },
+    "firstName": "Wit",
+    "lastName": "Leavold",
+    "type": "Employee",
+    "address": {
+      "street": "65337 Straubel Place",
+      "city": "Muncie",
+      "state": "IN",
+      "zip": "47306",
+      "country": "US"
+    },
+    "email": [
+      "wleavold2@npr.org",
+      "wleavold2@craigslist.org"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "cefa4f"
+    },
+    "firstName": "Zara",
+    "lastName": "Cullington",
+    "type": "Platinum",
+    "address": {
+      "street": "81 Northport Avenue",
+      "city": "Mobile",
+      "state": "AL",
+      "zip": "36628",
+      "country": "US"
+    },
+    "email": [
+      "zcullington3@engadget.com",
+      "zcullington3@wisc.edu",
+      "zcullington3@google.es",
+      "zcullington3@google.pl"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "48b5dc"
+    },
+    "firstName": "Frants",
+    "lastName": "Leaming",
+    "type": "Platinum",
+    "address": {
+      "street": "7 Sunbrook Center",
+      "city": "Young America",
+      "state": "MN",
+      "zip": "55551",
+      "country": "US"
+    },
+    "email": [
+      "fleaming4@elpais.com",
+      "fleaming4@unblog.fr",
+      "fleaming4@hugedomains.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "529dbe"
+    },
+    "firstName": "Bernadette",
+    "lastName": "Stammers",
+    "type": "Platinum",
+    "address": {
+      "street": "33 Lake View Alley",
+      "city": "Roanoke",
+      "state": "VA",
+      "zip": "24040",
+      "country": "US"
+    },
+    "email": [
+      "bstammers5@flickr.com",
+      "bstammers5@mapy.cz",
+      "bstammers5@cpanel.net"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "aef60b"
+    },
+    "firstName": "Gianni",
+    "lastName": "Uttley",
+    "type": "Gold",
+    "address": {
+      "street": "6811 Pleasure Point",
+      "city": "Salinas",
+      "state": "CA",
+      "zip": "93907",
+      "country": "US"
+    },
+    "email": [
+      "guttley6@sogou.com",
+      "guttley6@linkedin.com",
+      "guttley6@latimes.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "8197d3"
+    },
+    "firstName": "Farand",
+    "lastName": "Halse",
+    "type": "Gold",
+    "address": {
+      "street": "37 Hoard Circle",
+      "city": "Plano",
+      "state": "TX",
+      "zip": "75074",
+      "country": "US"
+    },
+    "email": [
+      "fhalse7@europa.eu",
+      "fhalse7@microsoft.com",
+      "fhalse7@fc2.com",
+      "fhalse7@moonfruit.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "f22d0b"
+    },
+    "firstName": "Denny",
+    "lastName": "Witherbed",
+    "type": "Gold",
+    "address": {
+      "street": "40 Aberg Avenue",
+      "city": "Fresno",
+      "state": "CA",
+      "zip": "93786",
+      "country": "US"
+    },
+    "email": [
+      "dwitherbed8@umich.edu",
+      "dwitherbed8@pbs.org",
+      "dwitherbed8@privacy.gov.au"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "d78da4"
+    },
+    "firstName": "Keslie",
+    "lastName": "Soloway",
+    "type": "Customer",
+    "address": {
+      "street": "5595 Saint Paul Place",
+      "city": "Annapolis",
+      "state": "MD",
+      "zip": "21405",
+      "country": "US"
+    },
+    "email": [
+      "ksoloway9@amazon.co.uk",
+      "ksoloway9@sitemeter.com",
+      "ksoloway9@cmu.edu",
+      "ksoloway9@unicef.org"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "99cdc9"
+    },
+    "firstName": "Rice",
+    "lastName": "Antoshin",
+    "type": "Customer",
+    "address": {
+      "street": "3 5th Junction",
+      "city": "Fort Collins",
+      "state": "CO",
+      "zip": "80525",
+      "country": "US"
+    },
+    "email": [
+      "rantoshina@cam.ac.uk",
+      "rantoshina@amazonaws.com",
+      "rantoshina@economist.com",
+      "rantoshina@sfgate.com"
+    ]
+  },
+  {
+    "legacyId": {
+      "id": "89a8a1"
+    },
+    "firstName": "Portia",
+    "lastName": "Pottie",
+    "type": "Customer",
+    "address": {
+      "street": "427 Nevada Pass",
+      "city": "Toledo",
+      "state": "OH",
+      "zip": "43656",
+      "country": "US"
+    },
+    "email": []
+  }
+]

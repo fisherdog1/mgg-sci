@@ -1,0 +1,140 @@
+[
+  {
+    "type": "New",
+    "basePrice": 39900,
+    "legacyId": {
+      "id": "1d4d89"
+    },
+    "name": "PlayStation 5 Digital Edition"
+  },
+  {
+    "type": "New",
+    "basePrice": 19900,
+    "legacyId": {
+      "id": "1ed5b7"
+    },
+    "name": "Nintendo Switch Lite"
+  },
+  {
+    "type": "New",
+    "basePrice": 5900,
+    "legacyId": {
+      "id": "6ce4cd"
+    },
+    "name": "Splatoon 2 (Digital Copy)"
+  },
+  {
+    "type": "New",
+    "basePrice": 100,
+    "legacyId": {
+      "id": "c547e7"
+    },
+    "name": "Diet Mt Dew (20oz)"
+  },
+  {
+    "type": "GiftCard",
+    "basePrice": 0,
+    "legacyId": {
+      "id": "5f73aa"
+    },
+    "name": "Nintendo Digital Gold"
+  },
+  {
+    "type": "GiftCard",
+    "basePrice": 0,
+    "legacyId": {
+      "id": "14e2b7"
+    },
+    "name": "Steam"
+  },
+  {
+    "type": "GiftCard",
+    "basePrice": 0,
+    "legacyId": {
+      "id": "8a30ad"
+    },
+    "name": "Android Store"
+  },
+  {
+    "type": "GiftCard",
+    "basePrice": 0,
+    "legacyId": {
+      "id": "daad6a"
+    },
+    "name": "Robux"
+  },
+  {
+    "type": "Used",
+    "basePrice": 2400,
+    "legacyId": {
+      "id": "649f88"
+    },
+    "name": "Legend of Zelda (NES)"
+  },
+  {
+    "type": "Used",
+    "basePrice": 5900,
+    "legacyId": {
+      "id": "0ec6e9"
+    },
+    "name": "Animal Crossings"
+  },
+  {
+    "type": "Used",
+    "basePrice": 19900,
+    "legacyId": {
+      "id": "9b6e30"
+    },
+    "name": "Oculus Rift"
+  },
+  {
+    "type": "Used",
+    "basePrice": 59900,
+    "legacyId": {
+      "id": "40a433"
+    },
+    "name": "Vive"
+  },
+  {
+    "hourlyRate": 5900,
+    "legacyId": {
+      "id": "8e366e"
+    },
+    "name": "Console Repair"
+  },
+  {
+    "hourlyRate": 12000,
+    "legacyId": {
+      "id": "c4fb35"
+    },
+    "name": "VR Party Rental"
+  },
+  {
+    "hourlyRate": 100,
+    "legacyId": {
+      "id": "740515"
+    },
+    "name": "Game Addiction Counseling"
+  },
+  {
+    "annualFee": 5000,
+    "legacyId": {
+      "id": "426dda"
+    },
+    "name": "X-Box Live"
+  },
+  {
+    "annualFee": 12000,
+    "legacyId": {
+      "id": "dedd44"
+    },
+    "name": "Nintendo Power magazine"
+  },
+  {
+    "annualFee": 8900,
+    "legacyId": {
+      "id": "3506f6"
+    },
+    "name": "Disney Plus"
+  }
+]

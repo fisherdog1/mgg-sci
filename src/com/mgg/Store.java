@@ -2,22 +2,22 @@ package com.mgg;
 
 public class Store
 {
-	private String legacyId;
-	private Person manager;
+	private LegacyID legacyId;
+	private LegacyID managerId;
 	private StreetAddress address;
 	
-	public Store(String legacyId, Person manager, StreetAddress address) {
-		this.legacyId = legacyId;
-		this.manager = manager;
+	public Store(String legacyId, String managerId, StreetAddress address) {
+		this.legacyId = new LegacyID(legacyId);
+		this.managerId = new LegacyID(managerId);
 		this.address = address;
 	}
 	
-	public String getLegacyId()	{
+	public LegacyID getLegacyId() {
 		return this.legacyId;
 	}
 	
-	public Person getManager() {
-		return this.manager;
+	public LegacyID getManager() {
+		return this.managerId;
 	}
 	
 	public StreetAddress getAddress() {
