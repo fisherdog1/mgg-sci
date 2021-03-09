@@ -11,10 +11,12 @@ public class LegacyID
 	private String id;
 	
 	public LegacyID(String id) {
-		this.id = id.trim().toLowerCase();
+		this.id = new String(id);
+		//this.id = id.trim().toLowerCase();
 		
 		//basic consistency checks
-		
+	
+		/**
 		if (this.id.length() != 6)
 			throw new RuntimeException("Bad Legacy ID length\n");
 		
@@ -22,6 +24,7 @@ public class LegacyID
 			if (!("0123456789abcdef".contains(this.id.subSequence(i, i+1))))
 				throw new RuntimeException("Legacy ID contains invalid character '%c'\n".formatted(this.id.charAt(i)));
 		}
+		**/ 
 		
 		//disallow id 000000?
 	}

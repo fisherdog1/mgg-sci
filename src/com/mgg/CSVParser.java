@@ -67,9 +67,7 @@ public abstract class CSVParser<T>
 				out.add(parseLine(items));
 			} catch(DataFormatException e) {
 				throw new RuntimeException("Could not parse line %d: %s\nin file: %s\n".formatted(lines+1, line, in));
-			}
-			
-			
+			}		
 		}
 		
 		sc.close();
