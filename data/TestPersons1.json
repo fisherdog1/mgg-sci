@@ -1,8 +1,5 @@
 [
   {
-    "legacyId": {
-      "id": "beef01"
-    },
     "firstName": "Polly",
     "lastName": "Placematt",
     "type": "Employee",
@@ -15,12 +12,10 @@
     },
     "email": [
       "pplacematt@gmail.com"
-    ]
+    ],
+    "legacyId": "beef01"
   },
   {
-    "legacyId": {
-      "id": "f00b10"
-    },
     "firstName": "Johnny",
     "lastName": "Tables",
     "type": "Gold",
@@ -33,12 +28,10 @@
     },
     "email": [
       "jtables@localhost:80"
-    ]
+    ],
+    "legacyId": "f00b10"
   },
   {
-    "legacyId": {
-      "id": "b00fe7"
-    },
     "firstName": " Leadingspaces",
     "lastName": " Larry",
     "type": "Platinum",
@@ -49,12 +42,10 @@
       "zip": "45201",
       "country": "US"
     },
-    "email": []
+    "email": [],
+    "legacyId": "b00fe7"
   },
   {
-    "legacyId": {
-      "id": "00ff74"
-    },
     "firstName": "Sally",
     "lastName": "Standart",
     "type": "Employee",
@@ -67,6 +58,7 @@
     },
     "email": [
       "sstandart@costco.com"
-    ]
+    ],
+    "legacyId": "00ff74"
   }
 ]

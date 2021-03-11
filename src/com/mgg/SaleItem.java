@@ -1,18 +1,17 @@
 package com.mgg;
 
-public class SaleItem
+import java.util.ArrayList;
+import java.util.List;
+
+public class SaleItem extends Legacy
 {
-	private LegacyID legacyId;
 	private String name;
 	
 	public SaleItem(String legacyId, String name) {
-		this.legacyId = new LegacyID(legacyId);
+		super(legacyId);
 		this.name = name;
 	}
 	
-	public LegacyID getLegacyId() {
-		return this.legacyId;
-	}
 	
 	public String getName() {
 		return this.name;
@@ -21,5 +20,12 @@ public class SaleItem
 	@Override
 	public String toString() {
 		return getName();
+	}
+	
+	@Override
+	public List<Legacy> getLegacys() {
+		List<Legacy> legacys = new ArrayList<Legacy>(1);
+		
+		return legacys;
 	}
 }

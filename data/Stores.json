@@ -1,10 +1,7 @@
 [
   {
-    "legacyId": {
-      "id": "3c0234"
-    },
     "managerId": {
-      "id": "fdc267"
+      "legacyId": "fdc267"
     },
     "address": {
       "street": "2 Crest Line Way",
@@ -12,14 +9,12 @@
       "state": "NY",
       "zip": "10184",
       "country": "US"
-    }
+    },
+    "legacyId": "3c0234"
   },
   {
-    "legacyId": {
-      "id": "9f352c"
-    },
     "managerId": {
-      "id": "aa887a"
+      "legacyId": "aa887a"
     },
     "address": {
       "street": "438 Jenna Road",
@@ -27,14 +22,12 @@
       "state": "AL",
       "zip": "35815",
       "country": "US"
-    }
+    },
+    "legacyId": "9f352c"
   },
   {
-    "legacyId": {
-      "id": "73668b"
-    },
     "managerId": {
-      "id": "fdc267"
+      "legacyId": "fdc267"
     },
     "address": {
       "street": "9257 Maywood Junction",
@@ -42,14 +35,12 @@
       "state": "AZ",
       "zip": "85099",
       "country": "US"
-    }
+    },
+    "legacyId": "73668b"
   },
   {
-    "legacyId": {
-      "id": "96f2cf"
-    },
     "managerId": {
-      "id": "fdc267"
+      "legacyId": "fdc267"
     },
     "address": {
       "street": "1145 Transport Drive",
@@ -57,14 +48,12 @@
       "state": "FL",
       "zip": "32605",
       "country": "US"
-    }
+    },
+    "legacyId": "96f2cf"
   },
   {
-    "legacyId": {
-      "id": "25d901"
-    },
     "managerId": {
-      "id": "aa887a"
+      "legacyId": "aa887a"
     },
     "address": {
       "street": "180 Magdeline Plaza",
@@ -72,6 +61,7 @@
       "state": "KS",
       "zip": "67230",
       "country": "US"
-    }
+    },
+    "legacyId": "25d901"
   }
 ]

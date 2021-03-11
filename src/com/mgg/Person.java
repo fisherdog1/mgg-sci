@@ -9,9 +9,8 @@ import java.util.List;
  * @author azimuth
  *
  */
-public class Person
+public class Person extends Legacy
 {
-	private LegacyID legacyId;
 	private String firstName;
 	private String lastName;
 	private CustomerType type;
@@ -19,7 +18,7 @@ public class Person
 	private List<String> email;
 	
 	public Person(String legacyId, String firstName, String lastName, CustomerType type, StreetAddress address) {
-		this.legacyId = new LegacyID(legacyId);
+		super(legacyId);
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.type = type;
@@ -30,10 +29,6 @@ public class Person
 	
 	public Person(String legacyId) {
 		this(legacyId, "Polly", "Placeholder", CustomerType.Customer, new StreetAddress());
-	}
-	
-	public LegacyID getLegacyId() {
-		return legacyId;
 	}
 	
 	public String getFirstName()	{

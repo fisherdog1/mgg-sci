@@ -1,10 +1,7 @@
 [
   {
-    "legacyId": {
-      "id": "f3671a"
-    },
     "managerId": {
-      "id": "beef01"
+      "legacyId": "beef01"
     },
     "address": {
       "street": "1 Polygon Plaza",
@@ -12,14 +9,12 @@
       "state": "CA",
       "zip": "45201",
       "country": "US"
-    }
+    },
+    "legacyId": "f3671a"
   },
   {
-    "legacyId": {
-      "id": "fff45e"
-    },
     "managerId": {
-      "id": "00ff74"
+      "legacyId": "00ff74"
     },
     "address": {
       "street": "1 Nothing Wrong With Me",
@@ -27,14 +22,12 @@
       "state": "WY",
       "zip": "12708",
       "country": "US"
-    }
+    },
+    "legacyId": "fff45E"
   },
   {
-    "legacyId": {
-      "id": "f3fff3"
-    },
     "managerId": {
-      "id": "123abc"
+      "legacyId": "123abc"
     },
     "address": {
       "street": "7 Agile Parkway",
@@ -42,6 +35,7 @@
       "state": "MO",
       "zip": "80451",
       "country": "US"
-    }
+    },
+    "legacyId": "f3fff3"
   }
 ]

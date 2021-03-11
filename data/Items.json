@@ -2,139 +2,103 @@
   {
     "type": "New",
     "basePrice": 39900,
-    "legacyId": {
-      "id": "1d4d89"
-    },
-    "name": "PlayStation 5 Digital Edition"
+    "name": "PlayStation 5 Digital Edition",
+    "legacyId": "1d4d89"
   },
   {
     "type": "New",
     "basePrice": 19900,
-    "legacyId": {
-      "id": "1ed5b7"
-    },
-    "name": "Nintendo Switch Lite"
+    "name": "Nintendo Switch Lite",
+    "legacyId": "1ed5b7"
   },
   {
     "type": "New",
     "basePrice": 5900,
-    "legacyId": {
-      "id": "6ce4cd"
-    },
-    "name": "Splatoon 2 (Digital Copy)"
+    "name": "Splatoon 2 (Digital Copy)",
+    "legacyId": "6ce4cd"
   },
   {
     "type": "New",
     "basePrice": 100,
-    "legacyId": {
-      "id": "c547e7"
-    },
-    "name": "Diet Mt Dew (20oz)"
+    "name": "Diet Mt Dew (20oz)",
+    "legacyId": "c547e7"
   },
   {
     "type": "GiftCard",
     "basePrice": 0,
-    "legacyId": {
-      "id": "5f73aa"
-    },
-    "name": "Nintendo Digital Gold"
+    "name": "Nintendo Digital Gold",
+    "legacyId": "5f73aa"
   },
   {
     "type": "GiftCard",
     "basePrice": 0,
-    "legacyId": {
-      "id": "14e2b7"
-    },
-    "name": "Steam"
+    "name": "Steam",
+    "legacyId": "14e2b7"
   },
   {
     "type": "GiftCard",
     "basePrice": 0,
-    "legacyId": {
-      "id": "8a30ad"
-    },
-    "name": "Android Store"
+    "name": "Android Store",
+    "legacyId": "8a30ad"
   },
   {
     "type": "GiftCard",
     "basePrice": 0,
-    "legacyId": {
-      "id": "daad6a"
-    },
-    "name": "Robux"
+    "name": "Robux",
+    "legacyId": "daad6a"
   },
   {
     "type": "Used",
     "basePrice": 2400,
-    "legacyId": {
-      "id": "649f88"
-    },
-    "name": "Legend of Zelda (NES)"
+    "name": "Legend of Zelda (NES)",
+    "legacyId": "649f88"
   },
   {
     "type": "Used",
     "basePrice": 5900,
-    "legacyId": {
-      "id": "0ec6e9"
-    },
-    "name": "Animal Crossings"
+    "name": "Animal Crossings",
+    "legacyId": "0ec6e9"
   },
   {
     "type": "Used",
     "basePrice": 19900,
-    "legacyId": {
-      "id": "9b6e30"
-    },
-    "name": "Oculus Rift"
+    "name": "Oculus Rift",
+    "legacyId": "9b6e30"
   },
   {
     "type": "Used",
     "basePrice": 59900,
-    "legacyId": {
-      "id": "40a433"
-    },
-    "name": "Vive"
+    "name": "Vive",
+    "legacyId": "40a433"
   },
   {
     "hourlyRate": 5900,
-    "legacyId": {
-      "id": "8e366e"
-    },
-    "name": "Console Repair"
+    "name": "Console Repair",
+    "legacyId": "8e366e"
   },
   {
     "hourlyRate": 12000,
-    "legacyId": {
-      "id": "c4fb35"
-    },
-    "name": "VR Party Rental"
+    "name": "VR Party Rental",
+    "legacyId": "c4fb35"
   },
   {
     "hourlyRate": 100,
-    "legacyId": {
-      "id": "740515"
-    },
-    "name": "Game Addiction Counseling"
+    "name": "Game Addiction Counseling",
+    "legacyId": "740515"
   },
   {
     "annualFee": 5000,
-    "legacyId": {
-      "id": "426dda"
-    },
-    "name": "X-Box Live"
+    "name": "X-Box Live",
+    "legacyId": "426dda"
   },
   {
     "annualFee": 12000,
-    "legacyId": {
-      "id": "dedd44"
-    },
-    "name": "Nintendo Power magazine"
+    "name": "Nintendo Power magazine",
+    "legacyId": "dedd44"
   },
   {
     "annualFee": 8900,
-    "legacyId": {
-      "id": "3506f6"
-    },
-    "name": "Disney Plus"
+    "name": "Disney Plus",
+    "legacyId": "3506f6"
   }
 ]

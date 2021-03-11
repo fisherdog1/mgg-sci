@@ -1,8 +1,5 @@
 [
   {
-    "legacyId": {
-      "id": "fdc267"
-    },
     "firstName": "Staci",
     "lastName": "Quarry",
     "type": "Employee",
@@ -16,12 +13,10 @@
     "email": [
       "squarry0@reverbnation.com",
       "squarry0@salon.com"
-    ]
+    ],
+    "legacyId": "fdc267"
   },
   {
-    "legacyId": {
-      "id": "0375b6"
-    },
     "firstName": "Nonnah",
     "lastName": "Michelotti",
     "type": "Employee",
@@ -37,12 +32,10 @@
       "nmichelotti1@vistaprint.com",
       "nmichelotti1@gravatar.com",
       "nmichelotti1@patch.com"
-    ]
+    ],
+    "legacyId": "0375b6"
   },
   {
-    "legacyId": {
-      "id": "aa887a"
-    },
     "firstName": "Wit",
     "lastName": "Leavold",
     "type": "Employee",
@@ -56,12 +49,10 @@
     "email": [
       "wleavold2@npr.org",
       "wleavold2@craigslist.org"
-    ]
+    ],
+    "legacyId": "aa887a"
   },
   {
-    "legacyId": {
-      "id": "cefa4f"
-    },
     "firstName": "Zara",
     "lastName": "Cullington",
     "type": "Platinum",
@@ -77,12 +68,10 @@
       "zcullington3@wisc.edu",
       "zcullington3@google.es",
       "zcullington3@google.pl"
-    ]
+    ],
+    "legacyId": "cefa4f"
   },
   {
-    "legacyId": {
-      "id": "48b5dc"
-    },
     "firstName": "Frants",
     "lastName": "Leaming",
     "type": "Platinum",
@@ -97,12 +86,10 @@
       "fleaming4@elpais.com",
       "fleaming4@unblog.fr",
       "fleaming4@hugedomains.com"
-    ]
+    ],
+    "legacyId": "48b5dc"
   },
   {
-    "legacyId": {
-      "id": "529dbe"
-    },
     "firstName": "Bernadette",
     "lastName": "Stammers",
     "type": "Platinum",
@@ -117,12 +104,10 @@
       "bstammers5@flickr.com",
       "bstammers5@mapy.cz",
       "bstammers5@cpanel.net"
-    ]
+    ],
+    "legacyId": "529dbe"
   },
   {
-    "legacyId": {
-      "id": "aef60b"
-    },
     "firstName": "Gianni",
     "lastName": "Uttley",
     "type": "Gold",
@@ -137,12 +122,10 @@
       "guttley6@sogou.com",
       "guttley6@linkedin.com",
       "guttley6@latimes.com"
-    ]
+    ],
+    "legacyId": "aef60b"
   },
   {
-    "legacyId": {
-      "id": "8197d3"
-    },
     "firstName": "Farand",
     "lastName": "Halse",
     "type": "Gold",
@@ -158,12 +141,10 @@
       "fhalse7@microsoft.com",
       "fhalse7@fc2.com",
       "fhalse7@moonfruit.com"
-    ]
+    ],
+    "legacyId": "8197d3"
   },
   {
-    "legacyId": {
-      "id": "f22d0b"
-    },
     "firstName": "Denny",
     "lastName": "Witherbed",
     "type": "Gold",
@@ -178,12 +159,10 @@
       "dwitherbed8@umich.edu",
       "dwitherbed8@pbs.org",
       "dwitherbed8@privacy.gov.au"
-    ]
+    ],
+    "legacyId": "f22d0b"
   },
   {
-    "legacyId": {
-      "id": "d78da4"
-    },
     "firstName": "Keslie",
     "lastName": "Soloway",
     "type": "Customer",
@@ -199,12 +178,10 @@
       "ksoloway9@sitemeter.com",
       "ksoloway9@cmu.edu",
       "ksoloway9@unicef.org"
-    ]
+    ],
+    "legacyId": "d78da4"
   },
   {
-    "legacyId": {
-      "id": "99cdc9"
-    },
     "firstName": "Rice",
     "lastName": "Antoshin",
     "type": "Customer",
@@ -220,12 +197,10 @@
       "rantoshina@amazonaws.com",
       "rantoshina@economist.com",
       "rantoshina@sfgate.com"
-    ]
+    ],
+    "legacyId": "99cdc9"
   },
   {
-    "legacyId": {
-      "id": "89a8a1"
-    },
     "firstName": "Portia",
     "lastName": "Pottie",
     "type": "Customer",
@@ -236,6 +211,7 @@
       "zip": "43656",
       "country": "US"
     },
-    "email": []
+    "email": [],
+    "legacyId": "89a8a1"
   }
 ]

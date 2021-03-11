@@ -1,22 +1,20 @@
 package com.mgg;
 
-public class Store
+import java.util.ArrayList;
+import java.util.List;
+
+public class Store extends Legacy
 {
-	private LegacyID legacyId;
-	private LegacyID managerId;
+	private Person managerId;
 	private StreetAddress address;
 	
 	public Store(String legacyId, String managerId, StreetAddress address) {
-		this.legacyId = new LegacyID(legacyId);
-		this.managerId = new LegacyID(managerId);
+		super(legacyId);
+		this.managerId = new Person(managerId);
 		this.address = address;
 	}
 	
-	public LegacyID getLegacyId() {
-		return this.legacyId;
-	}
-	
-	public LegacyID getManager() {
+	public Legacy getManager() {
 		return this.managerId;
 	}
 	
@@ -27,5 +25,13 @@ public class Store
 	@Override
 	public String toString() {
 		return address.toString();
+	}
+	
+	@Override
+	public List<Legacy> getLegacys() {
+		List<Legacy> legacys = new ArrayList<Legacy>(1);
+		legacys.add(managerId);
+		
+		return legacys;
 	}
 }

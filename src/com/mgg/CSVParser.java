@@ -14,7 +14,7 @@ import java.util.zip.DataFormatException;
  * @author azimuth
  *
  */
-public abstract class CSVParser<T>
+public abstract class CSVParser<T extends Legacy>
 {
 	/**
 	 * Parse one line of input
