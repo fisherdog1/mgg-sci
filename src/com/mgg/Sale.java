@@ -24,7 +24,7 @@ public class Sale extends Legacy
 		
 		if (!items.isEmpty()) {
 			for (SaleItem si : items)
-				if (si.isPlaceholder())
+				if (si.getProduct().isPlaceholder())
 					return;
 		}
 		
@@ -69,5 +69,20 @@ public class Sale extends Legacy
 	 */
 	public List<SaleItem> getItems() {
 		return items;
+	}
+
+	/**
+	 * returns the sale total in cents
+	 * @return
+	 */
+	public int total()
+	{
+		int total = 0;
+		
+		for (SaleItem si : items) {
+			total += si.getProduct().getTotalPrice(si.getParameters());
+		}
+		
+		return total;
 	}
 }

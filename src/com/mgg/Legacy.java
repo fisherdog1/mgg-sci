@@ -1,8 +1,5 @@
 package com.mgg;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Hex legacy ID. Provides slightly better control of IDs
  * Should eventually provide tools for organization and control of imported IDs

@@ -1,26 +1,36 @@
 package com.mgg;
 
-public class SaleItem extends Legacy
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * Combines a product with parameters from the time of sale such as quantity or gift card amount
+ * @author azimuth
+ *
+ */
+public class SaleItem
 {
-	private String name;
+	private Product product;
+	private Map<String,Object> params;
 	
-	public SaleItem(String legacyId) {
-		super(legacyId);
-		this.setPlaceholder(true);
+	public SaleItem(Product product) {
+		this.product = product;
+		params =  new TreeMap<String,Object>();
 	}
 	
-	public SaleItem(String legacyId, String name) {
-		super(legacyId);
-		this.name = name;
-		this.setPlaceholder(false);
+	public void addParameter(String name, Object value) {
+		params.put(name, value);
 	}
 	
-	public String getName() {
-		return this.name;
+	public Map<String,Object> getParameters() {
+		return params;
 	}
 	
-	@Override
-	public String toString() {
-		return getName();
+	public Product getProduct() {
+		return this.product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 }

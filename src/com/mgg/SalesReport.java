@@ -59,9 +59,6 @@ public class SalesReport
 	 */
 	public void updateAssociation(Legacy leg) {
 		
-		if (leg.getClass().getName().endsWith("Store"))
-			System.out.printf("C: %s\n",leg.getClass().getName());
-		
 		//TODO: there has to be a generic way to do this
 		
 		if (leg instanceof Store) {
@@ -91,17 +88,9 @@ public class SalesReport
 					((Sale) leg).setSalesperson(salesp);
 			}
 			
-			//Associate SaleItems
-			List<SaleItem> assocItems = new ArrayList<SaleItem>();
-			
 			for (SaleItem item : ((Sale) leg).getItems()) {
-				assocItems.add((SaleItem)findByPlaceholder(item));
+				item.setProduct((Product)findByPlaceholder(item.getProduct()));
 			}
-			
-			((Sale) leg).getItems().clear();
-			
-			for (SaleItem item : assocItems)
-				((Sale) leg).addItem(item);
 		}
 	}
 	
@@ -168,7 +157,8 @@ public class SalesReport
 						r.sales++;
 						totalSales++;
 						
-						//TODO: add sale total to totalCents
+						r.totalCents += s.total();
+						grandTotalCents += s.total();
 					}
 				}
 			}
@@ -208,7 +198,8 @@ public class SalesReport
 						r.sales++;
 						totalSales++;
 						
-						//TODO: add sale total to totalCents
+						r.totalCents += s.total();
+						grandTotalCents += s.total();
 					}
 				}
 			}
@@ -223,13 +214,79 @@ public class SalesReport
 		System.out.printf("%-49s %-4d     $%4d.%02d\n","",totalSales, grandTotalCents/100, grandTotalCents%100);
 	}
 	
+	public void detailSaleReport() {
+		for (Legacy l : all) {
+			if (l instanceof Sale) {
+				Sale s = (Sale)l;
+				
+				System.out.printf("Sale:  %s\n", s.getId());
+				System.out.printf("Store: %s\n", s.getStore().getId());
+				System.out.printf("Customer:\n");
+				System.out.printf("%s (%s)\n", s.getCustomer().getFullNameFormal(), s.getCustomer().getEmail());
+				System.out.printf("%s\n\n", s.getCustomer().getAddress());
+				
+				System.out.printf("Salesperson:\n");
+				System.out.printf("%s (%s)\n", s.getSalesperson().getFullNameFormal(), s.getSalesperson().getEmail());
+				System.out.printf("%s\n\n", s.getSalesperson().getAddress());
+				
+				int subtotal = 0;
+				int totalTax = 0;
+				
+				for (SaleItem si : s.getItems()) {
+					int lineTotal = 0;
+					int lineTax = 0;
+					
+					System.out.printf("%-48s\n", si.getProduct().getName());
+					System.out.printf("%10s ", si.getProduct().getId());
+					
+					String detail = "(";
+					
+					if (si.getProduct() instanceof Item) {
+						Item i = (Item)si.getProduct();
+						
+						//TODO: move this?
+						
+						if (i.getProductType() == ProductType.New) {
+							detail += "New Item @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
+						} else if (i.getProductType() == ProductType.Used) {
+							detail += "Used Item @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
+						} else if (i.getProductType() == ProductType.GiftCard) {
+							detail += "Gift Card";
+						}
+						
+						detail += ")";
+						
+						if (i.getProductType() == ProductType.GiftCard)
+							lineTotal = (int)((double)si.getParameters().get("CardAmount")*100.0);
+						else
+							lineTotal = (int)(i.getBasePrice() * (int)si.getParameters().get("Quantity"));
+						
+					} else if (si.getProduct() instanceof Service) {
+						
+					} else if (si.getProduct() instanceof Subscription) {
+						
+					}
+					
+					System.out.printf("%-32s $%4d.%02d\n",detail, lineTotal/100, lineTotal%100);
+					totalTax += Math.round(lineTotal * si.getProduct().getTaxRate());
+					subtotal += lineTotal;
+				}
+				
+				System.out.printf("%42s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
+				System.out.printf("%42s: $%4d.%02d\n\n", "Tax", totalTax/100, totalTax%100);
+				//TODO customer discount
+				
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 		
 		SalesReport sr = new SalesReport();
 		
 		sr.parseFile(new PersonParser(), new File("data/Persons.csv"));
 		sr.parseFile(new StoreParser(), new File("data/Stores.csv"));
-		sr.parseFile(new SaleItemParser(), new File("data/Items.csv"));
+		sr.parseFile(new ProductParser(), new File("data/Items.csv"));
 		sr.parseFile(new SaleParser(), new File("data/Sales.csv"));
 		
 		//TODO: do this automatically when new items are added (tree structure?)
@@ -238,5 +295,6 @@ public class SalesReport
 		
 		sr.salespersonSummaryReport();
 		sr.storeSummaryReport();
+		sr.detailSaleReport();
 	}
 }
