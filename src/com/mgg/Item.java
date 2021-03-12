@@ -40,7 +40,7 @@ public class Item extends Product
 	 */
 	public double getBasePrice() {
 		if (this.type == ProductType.Used)
-			return 0.8 * basePrice;
+			return Math.round(0.8 * (double)basePrice);
 		else
 			return basePrice;
 	}
@@ -51,8 +51,6 @@ public class Item extends Product
 	 * @return
 	 */
 	public int getTotalPrice(Map<String,Object> params) {
-		CustomerType t = (CustomerType)params.get("CustomerType");
-		
 		double price = 0.0;
 		
 		if (this.type == ProductType.GiftCard)

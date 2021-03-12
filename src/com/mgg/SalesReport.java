@@ -234,12 +234,11 @@ public class SalesReport
 				
 				for (SaleItem si : s.getItems()) {
 					int lineTotal = 0;
-					int lineTax = 0;
 					
 					System.out.printf("%-48s\n", si.getProduct().getName());
 					System.out.printf("%10s ", si.getProduct().getId());
 					
-					String detail = "(";
+					String detail = "";
 					
 					if (si.getProduct() instanceof Item) {
 						Item i = (Item)si.getProduct();
@@ -247,14 +246,12 @@ public class SalesReport
 						//TODO: move this?
 						
 						if (i.getProductType() == ProductType.New) {
-							detail += "New Item @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
+							detail = "(New Item) @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
 						} else if (i.getProductType() == ProductType.Used) {
-							detail += "Used Item @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
+							detail = "(Used Item) @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
 						} else if (i.getProductType() == ProductType.GiftCard) {
-							detail += "Gift Card";
+							detail = "(Gift Card)";
 						}
-						
-						detail += ")";
 						
 						if (i.getProductType() == ProductType.GiftCard)
 							lineTotal = (int)((double)si.getParameters().get("CardAmount")*100.0);
@@ -262,20 +259,34 @@ public class SalesReport
 							lineTotal = (int)(i.getBasePrice() * (int)si.getParameters().get("Quantity"));
 						
 					} else if (si.getProduct() instanceof Service) {
+						Service sv = (Service)si.getProduct();
 						
+						Person p = (Person)findByPlaceholder(new Person((String)si.getParameters().get("EmployeeID")));
+						int price = (int)Math.round(sv.getHourlyRate() * (double)si.getParameters().get("Hours"));
+						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(p.getId(), p.getFullNameFormal(), price/100, price%100);
+						
+						lineTotal+= price;
 					} else if (si.getProduct() instanceof Subscription) {
+						Subscription sc = (Subscription)si.getProduct();
 						
+						int days = sc.getDurationDays(si.getParameters());
+						int price = (int)(((double)days / 365.0) * sc.getAnnualFee());
+						
+						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getAnnualFee()/100, sc.getAnnualFee()%100);
+						
+						lineTotal += price;
 					}
 					
-					System.out.printf("%-32s $%4d.%02d\n",detail, lineTotal/100, lineTotal%100);
-					totalTax += Math.round(lineTotal * si.getProduct().getTaxRate());
+					System.out.printf("%-64s $%4d.%02d\n",detail, lineTotal/100, lineTotal%100);
+					totalTax += Math.round((double)lineTotal * si.getProduct().getTaxRate());
 					subtotal += lineTotal;
 				}
 				
-				System.out.printf("%42s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
-				System.out.printf("%42s: $%4d.%02d\n\n", "Tax", totalTax/100, totalTax%100);
+				System.out.printf("%74s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
+				System.out.printf("%74s: $%4d.%02d\n\n", "Tax", totalTax/100, totalTax%100);
 				//TODO customer discount
 				
+				double discount = s.getCustomer().getCustomerDiscout();
 			}
 		}
 	}

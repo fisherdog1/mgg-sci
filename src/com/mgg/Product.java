@@ -30,16 +30,5 @@ public abstract class Product extends Legacy
 		return 0.0;
 	}
 	
-	public double getCustomerDiscount(CustomerType t) {
-		if (t == CustomerType.Employee)
-			return 0.15;
-		else if (t == CustomerType.Platinum)
-			return 0.10;
-		else if (t == CustomerType.Gold)
-			return 0.05;
-		
-		return 0.00;
-	}
-	
 	public abstract int getTotalPrice(Map<String,Object> params);
 }

@@ -107,6 +107,21 @@ public class Person extends Legacy
 		return false;
 	}
 	
+	public static double getCustomerDiscount(CustomerType t) {
+		if (t == CustomerType.Employee)
+			return 0.15;
+		else if (t == CustomerType.Platinum)
+			return 0.10;
+		else if (t == CustomerType.Gold)
+			return 0.05;
+		
+		return 0.00;
+	}
+	
+	public double getCustomerDiscout() {
+		return Person.getCustomerDiscount(getType());
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("%s %s", firstName, lastName);

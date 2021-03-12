@@ -27,18 +27,22 @@ public class Subscription extends Product
 		return this.annualFee;
 	}
 
-	@Override
-	public int getTotalPrice(Map<String, Object> params)
-	{
-		CustomerType t = (CustomerType)params.get("CustomerType");
+	public int getDurationDays(Map<String, Object> params) {
 		LocalDate startDate = (LocalDate)params.get("StartDate");
 		LocalDate endDate = (LocalDate)params.get("EndDate");
 		
-		
-		double price = annualFee * ChronoUnit.DAYS.between(startDate, endDate) / 365.0;
+		//charge for at least one day, needed because between() returns a value rounded down
+		return (int)ChronoUnit.DAYS.between(startDate, endDate) + 1;
+	}
+	
+	@Override
+	public int getTotalPrice(Map<String, Object> params){
+		CustomerType t = (CustomerType)params.get("CustomerType");
+
+		double price = annualFee * getDurationDays(params) / 100.0;
 		
 		//Round to nearest cent
-		double roundedPrice = Math.round((1.0 - getCustomerDiscount(t)) * (1.0 + getTaxRate()) * price);
+		double roundedPrice = Math.round((1.0 + getTaxRate()) * price);
 		
 		return (int)roundedPrice;
 	}

@@ -37,7 +37,7 @@ public class Service extends Product
 		double hours = (double)params.get("Hours");
 		
 		//Round to nearest cent
-		double roundedPrice = Math.round((1.0 - getCustomerDiscount(t)) * (1.0 + getTaxRate()) * (double)hourlyRate * hours);
+		double roundedPrice = Math.round((1.0 - Person.getCustomerDiscount(t)) * (1.0 + getTaxRate()) * (double)hourlyRate * hours);
 		
 		return (int)roundedPrice;
 	}
