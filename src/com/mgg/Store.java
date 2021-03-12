@@ -1,21 +1,30 @@
 package com.mgg;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Store extends Legacy
 {
-	private Person managerId;
+	private Person manager;
 	private StreetAddress address;
 	
-	public Store(String legacyId, String managerId, StreetAddress address) {
+	public Store(String legacyId) {
 		super(legacyId);
-		this.managerId = new Person(managerId);
+	}
+	
+	public Store(String legacyId, String managerId, StreetAddress address) {
+		this(legacyId);
+		this.manager = new Person(managerId);
 		this.address = address;
 	}
 	
-	public Legacy getManager() {
-		return this.managerId;
+	public Person getManager() {
+		return this.manager;
+	}
+	
+	public void setManager(Person manager) {
+		//TODO: this shouldn't be handled here?
+		if (manager.isPlaceholder() == false)
+			this.setPlaceholder(false);
+		
+		this.manager = manager;
 	}
 	
 	public StreetAddress getAddress() {
@@ -25,13 +34,5 @@ public class Store extends Legacy
 	@Override
 	public String toString() {
 		return address.toString();
-	}
-	
-	@Override
-	public List<Legacy> getLegacys() {
-		List<Legacy> legacys = new ArrayList<Legacy>(1);
-		legacys.add(managerId);
-		
-		return legacys;
 	}
 }

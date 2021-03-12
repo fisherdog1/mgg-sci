@@ -15,6 +15,10 @@ public class Service extends SaleItem
 		this.hourlyRate = hourlyRate;
 	}
 	
+	public Service(String legacyId) {
+		super(legacyId);
+	}
+	
 	public int getHourlyRate() {
 		return this.hourlyRate;
 	}

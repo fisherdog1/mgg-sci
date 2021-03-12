@@ -25,13 +25,15 @@ public class Person extends Legacy
 		this.address = address;
 		
 		this.email = new ArrayList<String>(1);
+		this.setPlaceholder(false); //All legacy references handled
 	}
 	
 	public Person(String legacyId) {
 		this(legacyId, "Polly", "Placeholder", CustomerType.Customer, new StreetAddress());
+		this.setPlaceholder(true);
 	}
 	
-	public String getFirstName()	{
+	public String getFirstName() {
 		return firstName;
 	}
 	
@@ -39,12 +41,16 @@ public class Person extends Legacy
 		this.firstName = firstName;
 	}
 	
-	public String getLastName()	{
+	public String getLastName() {
 		return lastName;
 	}
 	
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+	
+	public String getFullNameFormal() {
+		return getLastName() + ", " + getFirstName();
 	}
 	
 	public CustomerType getType() {

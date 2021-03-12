@@ -12,42 +12,62 @@ public class Sale extends Legacy
 	
 	public Sale(String legacyId, String storeId, String customerId, String salespersonId) {
 		super(legacyId);
+		this.store = new Store(storeId);
+		this.customer = new Person(customerId);
+		this.salesperson = new Person(salespersonId);
 		items = new ArrayList<SaleItem>();
-		//TODO: unimplemented
+	}
+	
+	private void updatePlaceholderStatus() {
+		if (store.isPlaceholder() || customer.isPlaceholder() || salesperson.isPlaceholder())
+			return;
+		
+		if (!items.isEmpty()) {
+			for (SaleItem si : items)
+				if (si.isPlaceholder())
+					return;
+		}
+		
+		setPlaceholder(false);
 	}
 	
 	public Store getStore() {
 		return store;
+	}
+	
+	public void setStore(Store store) {
+		this.store = store;
+		updatePlaceholderStatus();
 	}
 
 	public Person getCustomer() {
 		return customer;
 	}
 	
+	public void setCustomer(Person customer) {
+		this.customer = customer;
+		updatePlaceholderStatus();
+	}
+	
 	public Person getSalesperson() {
 		return salesperson;
 	}
 	
+	public void setSalesperson(Person salesperson) {
+		this.salesperson = salesperson;
+		updatePlaceholderStatus();
+	}
+	
 	public void addItem(SaleItem item) {
 		items.add(item);
+		updatePlaceholderStatus();
 	}
 	
 	/**
-	 * Return a copy of the items list
+	 * Return the items list
 	 * @return
 	 */
 	public List<SaleItem> getItems() {
-		return new ArrayList<SaleItem>(items);
-	}
-	
-	@Override
-	public List<Legacy> getLegacys() {
-		List<Legacy> legacys = new ArrayList<Legacy>(1);
-		legacys.add(store);
-		legacys.add(customer);
-		legacys.add(salesperson);
-		legacys.addAll(items);
-		
-		return legacys;
+		return items;
 	}
 }

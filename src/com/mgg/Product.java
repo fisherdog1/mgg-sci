@@ -18,6 +18,10 @@ public class Product extends SaleItem
 			this.basePrice = basePrice;
 	}
 	
+	public Product(String legacyId) {
+		super(legacyId);
+	}
+	
 	public ProductType getProductType() {
 		return type;
 	}

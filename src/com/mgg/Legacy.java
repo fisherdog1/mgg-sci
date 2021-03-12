@@ -18,6 +18,8 @@ public abstract class Legacy
 	
 	public Legacy(String id) {
 		this.legacyId = new String(id);
+		this.placeholder = true;
+		
 		//this.id = id.trim().toLowerCase();
 		
 		//basic consistency checks
@@ -43,33 +45,11 @@ public abstract class Legacy
 		return new String(legacyId);
 	}
 	
-	public boolean getPlaceholder() {
+	public boolean isPlaceholder() {
 		return placeholder;
 	}
 	
-	/**
-	 * Return legacy entities such as Persons
-	 * Should be overridden by subclass if it has at least one Legacy as a child element
-	 * @return
-	 */
-	public List<Legacy> getLegacys() {
-		List<Legacy> legacys = new ArrayList<Legacy>(0);
-		
-		return legacys;
-	}
-	
-	/**
-	 * Return a list of Legacy entities that have not yet been associated with loaded objects
-	 * Checks the list of Legacy entities and returns those that are placeholders
-	 * @return
-	 */
-	public List<Legacy> getPlaceholders() {
-		List<Legacy> placeholders = new ArrayList<Legacy>();
-		
-		for (Legacy placeholder : this.getLegacys())
-			if (placeholder.getPlaceholder())
-				placeholders.add(placeholder);
-		
-		return placeholders;
+	public void setPlaceholder(boolean val) {
+		this.placeholder = val;
 	}
 }

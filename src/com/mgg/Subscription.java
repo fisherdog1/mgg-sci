@@ -13,6 +13,10 @@ public class Subscription extends SaleItem
 		this.annualFee = annualFee;
 	}
 	
+	public Subscription(String legacyId) {
+		super(legacyId);
+	}
+	
 	public int getAnnualFee() {
 		return this.annualFee;
 	}
