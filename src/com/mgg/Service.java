@@ -29,17 +29,4 @@ public class Service extends Product
 	public int getHourlyRate() {
 		return this.hourlyRate;
 	}
-
-	@Override
-	public int getTotalPrice(Map<String, Object> params)
-	{
-		CustomerType t = (CustomerType)params.get("CustomerType");
-		double hours = (double)params.get("Hours");
-		
-		//Round to nearest cent
-		double roundedPrice = Math.round((1.0 - Person.getCustomerDiscount(t)) * (1.0 + getTaxRate()) * (double)hourlyRate * hours);
-		
-		return (int)roundedPrice;
-	}
-	
 }

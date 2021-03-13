@@ -29,6 +29,4 @@ public abstract class Product extends Legacy
 	public double getTaxRate() {
 		return 0.0;
 	}
-	
-	public abstract int getTotalPrice(Map<String,Object> params);
 }

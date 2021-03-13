@@ -1,10 +1,8 @@
 package com.mgg;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
 
@@ -18,11 +16,14 @@ public class SaleParser extends CSVParser<Sale>
 	SimpleDateFormat fmt;
 	Pattern qtyPat;
 	Pattern currencyPat;
+	ProductClassProvider provider;
 	
-	public SaleParser() {
+	public SaleParser(ProductClassProvider provider) {
 		fmt = new SimpleDateFormat("yyyy-MM-dd");
 		qtyPat = Pattern.compile("[0-9]+");
 		currencyPat = Pattern.compile("[0-9]+\\.*[0-9]*");
+		
+		this.provider = provider;
 	}
 	
 	@Override
@@ -36,44 +37,36 @@ public class SaleParser extends CSVParser<Sale>
 		while (i+1 < items.length) {
 			//add SaleItems to sale
 			//First column per item will always be a LegacyID
-			SaleItem si;
+			SaleItem<?> si;
 			
 			String id = items[i];
+			Product pdtype = (Product)this.provider.findById(id);
+			String classname = pdtype.getClass().getName();
 			
-			LocalDate sdate = LocalDate.now();
-			LocalDate edate = LocalDate.now();
-			boolean hasdates = false;
+			boolean giftCard = false;
 			
-			try {
-				sdate = LocalDate.parse(items[i+1]);
-				if (i+2 < items.length)
-					edate = LocalDate.parse(items[i+2]);
-				
-				hasdates = true;
-				
-			} catch (DateTimeParseException pe) { }
+			if (pdtype instanceof Item)
+				if (((Item)pdtype).getProductType() == ProductType.GiftCard)
+					giftCard = true;
 			
-			if (i+2 < items.length && !currencyPat.matcher(items[i+1]).matches() && currencyPat.matcher(items[i+2]).matches()) { //has an employee code and decimal hours (service)
+			if (classname.isBlank())
+				throw new RuntimeException("Could not determine type of sale item");
+			
+			if (classname.endsWith("Service")) {
 				String employeeCode = items[i+1];
 				double hours = Float.parseFloat(items[i+2]);
-				si = new SaleItem(new Service(id));
-				si.addParameter("EmployeeID", employeeCode);
-				si.addParameter("Hours", hours);
+				si = new ServiceSaleItem(new Service(id), hours, employeeCode);
 				i+=3;
-			} else if (qtyPat.matcher(items[i+1]).matches()) { //is a quantity (new or used product)
-				int qty = Integer.parseInt(items[i+1]);
-				si = new SaleItem(new Item(id));
-				si.addParameter("Quantity", qty);
-				i += 2;
-			} else if (currencyPat.matcher(items[i+1]).matches()) { //is a dollar amt (gift card)
+			} else if (classname.endsWith("Item") && giftCard) { //is a dollar amt (gift card)
 				double amt = Float.parseFloat(items[i+1]);
-				si = new SaleItem(new Item(id));
-				si.addParameter("CardAmount", amt);
+				si = new ChargedSaleItem(new Item(id), (int)Math.round(amt*100.0));
 				i += 2;
-			} else if (hasdates) { //is a date (subscription)
-				si = new SaleItem(new Subscription(id));
-				si.addParameter("StartDate", sdate);
-				si.addParameter("EndDate", edate);
+			} else if (classname.endsWith("Item")) { //is a quantity (new or used product)
+				int qty = Integer.parseInt(items[i+1]);
+				si = new QuantitySaleItem(new Item(id), qty);
+				i += 2;
+			} else if (classname.endsWith("Subscription")) { //is a date (subscription)
+				si = new SubscriptionSaleItem(new Subscription(id), LocalDate.parse(items[i+1]), LocalDate.parse(items[i+2]));
 				i += 3;
 			} else {
 				throw new RuntimeException("Invalid sale item type in input file\n");

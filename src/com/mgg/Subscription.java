@@ -34,16 +34,4 @@ public class Subscription extends Product
 		//charge for at least one day, needed because between() returns a value rounded down
 		return (int)ChronoUnit.DAYS.between(startDate, endDate) + 1;
 	}
-	
-	@Override
-	public int getTotalPrice(Map<String, Object> params){
-		CustomerType t = (CustomerType)params.get("CustomerType");
-
-		double price = annualFee * getDurationDays(params) / 100.0;
-		
-		//Round to nearest cent
-		double roundedPrice = Math.round((1.0 + getTaxRate()) * price);
-		
-		return (int)roundedPrice;
-	}
 }

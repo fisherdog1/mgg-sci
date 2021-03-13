@@ -12,11 +12,10 @@ import java.util.List;
  * @author azimuth
  *
  */
-public class SalesReport
+public class SalesReport implements ProductClassProvider
 {
 	/**
-	 * Compares two Legacy entities first by their class name and then by their legacyID
-	 * This ensures all entities of the same type (Store,Person,etc) are sorted next to eachother
+	 * Compares two Legacy entities by their legacyID
 	 * @author azimuth
 	 *
 	 */
@@ -24,12 +23,7 @@ public class SalesReport
 	{
 		@Override
 		public int compare(Legacy a, Legacy b) {
-			int classcmp = a.getClass().getName().compareTo(b.getClass().getName());
-			
-			if (classcmp == 0)
-				return a.getId().compareTo(b.getId());
-			else
-				return classcmp;
+			return a.getId().compareTo(b.getId());
 		}
 	}
 	
@@ -43,11 +37,16 @@ public class SalesReport
 		all.addAll(parser.parse(in));
 	}
 	
-	public Legacy findByPlaceholder(Legacy ph) {
-		int i = Collections.binarySearch(all, ph, new LegacyComparator());
+	public Legacy findById(String id) {
+		//TODO: binary search stopped working when SaleParser was changed??
+		//int i = Collections.binarySearch(all, new Legacy(id), new LegacyComparator());
 		
-		if (i >= 0)
-			return all.get(i);
+		for (Legacy l : all)
+			if (l.getId().equals(id))
+				return l;
+		
+//		if (i >= 0)
+//			return all.get(i);
 		
 		return null;
 	}
@@ -63,33 +62,32 @@ public class SalesReport
 		
 		if (leg instanceof Store) {
 			if (((Store) leg).getManager().isPlaceholder()) {
-				Person mgr = (Person)findByPlaceholder(((Store) leg).getManager());
+				Person mgr = (Person)findById(((Store) leg).getManager().getId());
 				if (mgr != null)
 					((Store) leg).setManager(mgr);
 			}
 				
-				
 		} else if (leg instanceof Sale) {
 			if (((Sale) leg).getStore().isPlaceholder()) {
-				Store store = (Store)findByPlaceholder(((Sale) leg).getStore());
+				Store store = (Store)findById(((Sale) leg).getStore().getId());
 				if (store != null)
 					((Sale) leg).setStore(store);
 			}
 			
 			if (((Sale) leg).getCustomer().isPlaceholder()) {
-				Person cust = (Person)findByPlaceholder(((Sale) leg).getCustomer());
+				Person cust = (Person)findById(((Sale) leg).getCustomer().getId());
 				if (cust != null)
 					((Sale) leg).setCustomer(cust);
 			}
 			
 			if (((Sale) leg).getSalesperson().isPlaceholder()) {
-				Person salesp = (Person)findByPlaceholder(((Sale) leg).getSalesperson());
+				Person salesp = (Person)findById(((Sale) leg).getSalesperson().getId());
 				if (salesp != null)
 					((Sale) leg).setSalesperson(salesp);
 			}
 			
 			for (SaleItem item : ((Sale) leg).getItems()) {
-				item.setProduct((Product)findByPlaceholder(item.getProduct()));
+				item.setProduct((Product)findById(item.getProduct().getId()));
 			}
 		}
 	}
@@ -138,6 +136,7 @@ public class SalesReport
 			}
 		}
 		
+		//Sort rows by name
 		rows.sort(new Comparator<SalespersonReportRow>() {
 			@Override
 			public int compare(SalespersonReportRow a, SalespersonReportRow b) {
@@ -157,8 +156,8 @@ public class SalesReport
 						r.sales++;
 						totalSales++;
 						
-						r.totalCents += s.total();
-						grandTotalCents += s.total();
+						r.totalCents += s.getGrandTotal();
+						grandTotalCents += s.getGrandTotal();
 					}
 				}
 			}
@@ -172,7 +171,7 @@ public class SalesReport
 			System.out.printf("%-24s %-4d     $%4d.%02d\n", r.salesperson.getFullNameFormal(), r.sales, r.totalCents/100, r.totalCents%100);
 		}
 		
-		System.out.printf("%-24s %-4d     $%4d.%02d\n","",totalSales, grandTotalCents/100, grandTotalCents%100);
+		System.out.printf("%-24s %-4d     $%4d.%02d\n\n","Total Sales: ",totalSales, grandTotalCents/100, grandTotalCents%100);
 	}
 	
 	public void storeSummaryReport() {
@@ -198,8 +197,8 @@ public class SalesReport
 						r.sales++;
 						totalSales++;
 						
-						r.totalCents += s.total();
-						grandTotalCents += s.total();
+						r.totalCents += s.getGrandTotal();
+						grandTotalCents += s.getGrandTotal();
 					}
 				}
 			}
@@ -211,7 +210,7 @@ public class SalesReport
 			System.out.printf("%-24s %-24s %-4d     $%4d.%02d\n", r.store.getId(), r.store.getManager().getFullNameFormal(), r.sales, r.totalCents/100, r.totalCents%100);
 		}
 		
-		System.out.printf("%-49s %-4d     $%4d.%02d\n","",totalSales, grandTotalCents/100, grandTotalCents%100);
+		System.out.printf("%-49s %-4d     $%4d.%02d\n\n","Total sales: ",totalSales, grandTotalCents/100, grandTotalCents%100);
 	}
 	
 	public void detailSaleReport() {
@@ -222,18 +221,17 @@ public class SalesReport
 				System.out.printf("Sale:  %s\n", s.getId());
 				System.out.printf("Store: %s\n", s.getStore().getId());
 				System.out.printf("Customer:\n");
-				System.out.printf("%s (%s)\n", s.getCustomer().getFullNameFormal(), s.getCustomer().getEmail());
-				System.out.printf("%s\n\n", s.getCustomer().getAddress());
+				System.out.printf("    %s (%s)\n", s.getCustomer().getFullNameFormal(), s.getCustomer().getEmail());
+				System.out.printf("    %s\n\n", s.getCustomer().getAddress());
 				
 				System.out.printf("Salesperson:\n");
-				System.out.printf("%s (%s)\n", s.getSalesperson().getFullNameFormal(), s.getSalesperson().getEmail());
-				System.out.printf("%s\n\n", s.getSalesperson().getAddress());
+				System.out.printf("    %s (%s)\n", s.getSalesperson().getFullNameFormal(), s.getSalesperson().getEmail());
+				System.out.printf("    %s\n\n", s.getSalesperson().getAddress());
 				
-				int subtotal = 0;
-				int totalTax = 0;
+				int subtotal = s.getSubtotal();
+				int totalTax = s.getTax();
 				
-				for (SaleItem si : s.getItems()) {
-					int lineTotal = 0;
+				for (SaleItem<?> si : s.getItems()) {
 					
 					System.out.printf("%-48s\n", si.getProduct().getName());
 					System.out.printf("%10s ", si.getProduct().getId());
@@ -244,49 +242,43 @@ public class SalesReport
 						Item i = (Item)si.getProduct();
 						
 						//TODO: move this?
+						//TODO: clean this for sure
 						
 						if (i.getProductType() == ProductType.New) {
-							detail = "(New Item) @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
+							detail = "(New Item) @$%d.%02d/ea".formatted((int)si.getSalePrice()/100, (int)si.getSalePrice()%100);
 						} else if (i.getProductType() == ProductType.Used) {
-							detail = "(Used Item) @$%d.%02d/ea".formatted((int)i.getBasePrice()/100, (int)i.getBasePrice()%100);
+							detail = "(Used Item) @$%d.%02d/ea".formatted((int)si.getSalePrice()/100, (int)si.getSalePrice()%100);
 						} else if (i.getProductType() == ProductType.GiftCard) {
 							detail = "(Gift Card)";
 						}
 						
-						if (i.getProductType() == ProductType.GiftCard)
-							lineTotal = (int)((double)si.getParameters().get("CardAmount")*100.0);
-						else
-							lineTotal = (int)(i.getBasePrice() * (int)si.getParameters().get("Quantity"));
-						
 					} else if (si.getProduct() instanceof Service) {
 						Service sv = (Service)si.getProduct();
 						
-						Person p = (Person)findByPlaceholder(new Person((String)si.getParameters().get("EmployeeID")));
-						int price = (int)Math.round(sv.getHourlyRate() * (double)si.getParameters().get("Hours"));
-						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(p.getId(), p.getFullNameFormal(), price/100, price%100);
+						int price = si.getSalePrice();
+						String salespersonId = ((ServiceSaleItem)si).getServicepersonId();
+						String salespersonName = ((Person)findById(salespersonId)).getFullNameFormal();
+					
+						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(salespersonId, salespersonName, price/100, price%100);
 						
-						lineTotal+= price;
 					} else if (si.getProduct() instanceof Subscription) {
 						Subscription sc = (Subscription)si.getProduct();
 						
-						int days = sc.getDurationDays(si.getParameters());
-						int price = (int)(((double)days / 365.0) * sc.getAnnualFee());
+						int days = (int)Math.round(((double)si.getSalePrice() / (double)sc.getAnnualFee()) * 365);
 						
 						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getAnnualFee()/100, sc.getAnnualFee()%100);
 						
-						lineTotal += price;
 					}
 					
-					System.out.printf("%-64s $%4d.%02d\n",detail, lineTotal/100, lineTotal%100);
-					totalTax += Math.round((double)lineTotal * si.getProduct().getTaxRate());
-					subtotal += lineTotal;
+					System.out.printf("%-64s $%4d.%02d\n",detail, si.getSalePrice()/100, si.getSalePrice()%100);
 				}
 				
 				System.out.printf("%74s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
-				System.out.printf("%74s: $%4d.%02d\n\n", "Tax", totalTax/100, totalTax%100);
-				//TODO customer discount
-				
-				double discount = s.getCustomer().getCustomerDiscout();
+				System.out.printf("%74s: $%4d.%02d\n", "Tax", totalTax/100, totalTax%100);
+
+				int discount = s.getSubtotalTax() - s.getGrandTotal();
+				System.out.printf("%65s (%05.2f%%): $%4d.%02d\n", "Discount", s.getCustomer().getCustomerDiscout()*100, discount/100, discount%100);
+				System.out.printf("%74s: $%4d.%02d\n\n","Grand Total", s.getGrandTotal()/100, s.getGrandTotal()%100);
 			}
 		}
 	}
@@ -298,10 +290,12 @@ public class SalesReport
 		sr.parseFile(new PersonParser(), new File("data/Persons.csv"));
 		sr.parseFile(new StoreParser(), new File("data/Stores.csv"));
 		sr.parseFile(new ProductParser(), new File("data/Items.csv"));
-		sr.parseFile(new SaleParser(), new File("data/Sales.csv"));
 		
 		//TODO: do this automatically when new items are added (tree structure?)
 		sr.all.sort(new LegacyComparator());
+		
+		sr.parseFile(new SaleParser(sr), new File("data/Sales.csv"));
+	
 		sr.updateAllAssociations();
 		
 		sr.salespersonSummaryReport();

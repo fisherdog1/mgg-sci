@@ -8,7 +8,7 @@ package com.mgg;
  * @author azimuth
  *
  */
-public abstract class Legacy
+public class Legacy
 {
 	private String legacyId;
 	private boolean placeholder;

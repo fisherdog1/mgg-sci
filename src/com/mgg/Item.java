@@ -35,7 +35,7 @@ public class Item extends Product
 	}
 	
 	/**
-	 * Return base price modified by type only, applies used discount
+	 * Return base price modified by ProductType only, applies used discount
 	 * @return
 	 */
 	public double getBasePrice() {
@@ -43,24 +43,5 @@ public class Item extends Product
 			return Math.round(0.8 * (double)basePrice);
 		else
 			return basePrice;
-	}
-	
-	/**
-	 * Return price corrected for customerType discount and tax
-	 * @param params
-	 * @return
-	 */
-	public int getTotalPrice(Map<String,Object> params) {
-		double price = 0.0;
-		
-		if (this.type == ProductType.GiftCard)
-			price = (double)params.get("CardAmount");
-		else
-			price = getBasePrice();
-		
-		//Round to nearest cent
-		double roundedPrice = Math.round((1.0 + getTaxRate()) * price);
-		
-		return (int)roundedPrice;
 	}
 }
