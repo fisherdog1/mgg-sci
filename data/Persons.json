@@ -14,7 +14,8 @@
       "squarry0@reverbnation.com",
       "squarry0@salon.com"
     ],
-    "legacyId": "fdc267"
+    "legacyId": "fdc267",
+    "placeholder": false
   },
   {
     "firstName": "Nonnah",
@@ -33,7 +34,8 @@
       "nmichelotti1@gravatar.com",
       "nmichelotti1@patch.com"
     ],
-    "legacyId": "0375b6"
+    "legacyId": "0375b6",
+    "placeholder": false
   },
   {
     "firstName": "Wit",
@@ -50,7 +52,8 @@
       "wleavold2@npr.org",
       "wleavold2@craigslist.org"
     ],
-    "legacyId": "aa887a"
+    "legacyId": "aa887a",
+    "placeholder": false
   },
   {
     "firstName": "Zara",
@@ -69,7 +72,8 @@
       "zcullington3@google.es",
       "zcullington3@google.pl"
     ],
-    "legacyId": "cefa4f"
+    "legacyId": "cefa4f",
+    "placeholder": false
   },
   {
     "firstName": "Frants",
@@ -87,7 +91,8 @@
       "fleaming4@unblog.fr",
       "fleaming4@hugedomains.com"
     ],
-    "legacyId": "48b5dc"
+    "legacyId": "48b5dc",
+    "placeholder": false
   },
   {
     "firstName": "Bernadette",
@@ -105,7 +110,8 @@
       "bstammers5@mapy.cz",
       "bstammers5@cpanel.net"
     ],
-    "legacyId": "529dbe"
+    "legacyId": "529dbe",
+    "placeholder": false
   },
   {
     "firstName": "Gianni",
@@ -123,7 +129,8 @@
       "guttley6@linkedin.com",
       "guttley6@latimes.com"
     ],
-    "legacyId": "aef60b"
+    "legacyId": "aef60b",
+    "placeholder": false
   },
   {
     "firstName": "Farand",
@@ -142,7 +149,8 @@
       "fhalse7@fc2.com",
       "fhalse7@moonfruit.com"
     ],
-    "legacyId": "8197d3"
+    "legacyId": "8197d3",
+    "placeholder": false
   },
   {
     "firstName": "Denny",
@@ -160,7 +168,8 @@
       "dwitherbed8@pbs.org",
       "dwitherbed8@privacy.gov.au"
     ],
-    "legacyId": "f22d0b"
+    "legacyId": "f22d0b",
+    "placeholder": false
   },
   {
     "firstName": "Keslie",
@@ -179,7 +188,8 @@
       "ksoloway9@cmu.edu",
       "ksoloway9@unicef.org"
     ],
-    "legacyId": "d78da4"
+    "legacyId": "d78da4",
+    "placeholder": false
   },
   {
     "firstName": "Rice",
@@ -198,7 +208,8 @@
       "rantoshina@economist.com",
       "rantoshina@sfgate.com"
     ],
-    "legacyId": "99cdc9"
+    "legacyId": "99cdc9",
+    "placeholder": false
   },
   {
     "firstName": "Portia",
@@ -212,6 +223,7 @@
       "country": "US"
     },
     "email": [],
-    "legacyId": "89a8a1"
+    "legacyId": "89a8a1",
+    "placeholder": false
   }
 ]

@@ -13,7 +13,8 @@
     "email": [
       "pplacematt@gmail.com"
     ],
-    "legacyId": "beef01"
+    "legacyId": "beef01",
+    "placeholder": false
   },
   {
     "firstName": "Johnny",
@@ -29,7 +30,8 @@
     "email": [
       "jtables@localhost:80"
     ],
-    "legacyId": "f00b10"
+    "legacyId": "f00b10",
+    "placeholder": false
   },
   {
     "firstName": " Leadingspaces",
@@ -43,7 +45,8 @@
       "country": "US"
     },
     "email": [],
-    "legacyId": "b00fe7"
+    "legacyId": "b00fe7",
+    "placeholder": false
   },
   {
     "firstName": "Sally",
@@ -59,6 +62,7 @@
     "email": [
       "sstandart@costco.com"
     ],
-    "legacyId": "00ff74"
+    "legacyId": "00ff74",
+    "placeholder": false
   }
 ]

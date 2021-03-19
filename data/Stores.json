@@ -1,7 +1,19 @@
 [
   {
-    "managerId": {
-      "legacyId": "fdc267"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "fdc267",
+      "placeholder": true
     },
     "address": {
       "street": "2 Crest Line Way",
@@ -10,11 +22,24 @@
       "zip": "10184",
       "country": "US"
     },
-    "legacyId": "3c0234"
+    "legacyId": "3c0234",
+    "placeholder": true
   },
   {
-    "managerId": {
-      "legacyId": "aa887a"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "aa887a",
+      "placeholder": true
     },
     "address": {
       "street": "438 Jenna Road",
@@ -23,11 +48,24 @@
       "zip": "35815",
       "country": "US"
     },
-    "legacyId": "9f352c"
+    "legacyId": "9f352c",
+    "placeholder": true
   },
   {
-    "managerId": {
-      "legacyId": "fdc267"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "fdc267",
+      "placeholder": true
     },
     "address": {
       "street": "9257 Maywood Junction",
@@ -36,11 +74,24 @@
       "zip": "85099",
       "country": "US"
     },
-    "legacyId": "73668b"
+    "legacyId": "73668b",
+    "placeholder": true
   },
   {
-    "managerId": {
-      "legacyId": "fdc267"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "fdc267",
+      "placeholder": true
     },
     "address": {
       "street": "1145 Transport Drive",
@@ -49,11 +100,24 @@
       "zip": "32605",
       "country": "US"
     },
-    "legacyId": "96f2cf"
+    "legacyId": "96f2cf",
+    "placeholder": true
   },
   {
-    "managerId": {
-      "legacyId": "aa887a"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "aa887a",
+      "placeholder": true
     },
     "address": {
       "street": "180 Magdeline Plaza",
@@ -62,6 +126,7 @@
       "zip": "67230",
       "country": "US"
     },
-    "legacyId": "25d901"
+    "legacyId": "25d901",
+    "placeholder": true
   }
 ]

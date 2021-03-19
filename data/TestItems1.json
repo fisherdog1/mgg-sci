@@ -1,19 +1,22 @@
 [
   {
     "type": "New",
-    "basePrice": 2900,
+    "basePrice": 2995,
     "name": "Boondoggle",
-    "legacyId": "1d3251"
+    "legacyId": "1d3251",
+    "placeholder": false
   },
   {
     "type": "GiftCard",
     "basePrice": 0,
     "name": "Fortnite Bucks",
-    "legacyId": "1d07f6"
+    "legacyId": "1d07f6",
+    "placeholder": false
   },
   {
-    "annualFee": 1500,
+    "annualFee": 1599,
     "name": "Greatfun",
-    "legacyId": "1f8924"
+    "legacyId": "1f8924",
+    "placeholder": false
   }
 ]

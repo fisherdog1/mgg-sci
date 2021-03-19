@@ -45,12 +45,12 @@ public class DataConverter
 		gsonWriteList(gson, new File("data/Items.json"), itemList);
 		
 		//additional test input
-		personList = new PersonParser().parse(new File("data/TestPersons1.csv"));
-		storeList = new StoreParser().parse(new File("data/TestStores1.csv"));
-		itemList = new ProductParser().parse(new File("data/TestItems1.csv"));
+		//personList = new PersonParser().parse(new File("data/TestPersons1.csv"));
+		//storeList = new StoreParser().parse(new File("data/TestStores1.csv"));
+		//itemList = new ProductParser().parse(new File("data/TestItems1.csv"));
 		
-		gsonWriteList(gson, new File("data/TestPersons1.json"), personList);
-		gsonWriteList(gson, new File("data/TestStores1.json"), storeList);
-		gsonWriteList(gson, new File("data/TestItems1.json"), itemList);
+		//gsonWriteList(gson, new File("data/TestPersons1.json"), personList);
+		//gsonWriteList(gson, new File("data/TestStores1.json"), storeList);
+		//gsonWriteList(gson, new File("data/TestItems1.json"), itemList);
 	}
 }

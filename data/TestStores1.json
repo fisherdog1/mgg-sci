@@ -1,7 +1,19 @@
 [
   {
-    "managerId": {
-      "legacyId": "beef01"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "beef01",
+      "placeholder": true
     },
     "address": {
       "street": "1 Polygon Plaza",
@@ -10,11 +22,24 @@
       "zip": "45201",
       "country": "US"
     },
-    "legacyId": "f3671a"
+    "legacyId": "f3671a",
+    "placeholder": true
   },
   {
-    "managerId": {
-      "legacyId": "00ff74"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "00ff74",
+      "placeholder": true
     },
     "address": {
       "street": "1 Nothing Wrong With Me",
@@ -23,11 +48,24 @@
       "zip": "12708",
       "country": "US"
     },
-    "legacyId": "fff45E"
+    "legacyId": "fff45E",
+    "placeholder": true
   },
   {
-    "managerId": {
-      "legacyId": "123abc"
+    "manager": {
+      "firstName": "Polly",
+      "lastName": "Placeholder",
+      "type": "Customer",
+      "address": {
+        "street": "Placeholder",
+        "city": "",
+        "state": "",
+        "zip": "",
+        "country": ""
+      },
+      "email": [],
+      "legacyId": "123abc",
+      "placeholder": true
     },
     "address": {
       "street": "7 Agile Parkway",
@@ -36,6 +74,7 @@
       "zip": "80451",
       "country": "US"
     },
-    "legacyId": "f3fff3"
+    "legacyId": "f3fff3",
+    "placeholder": true
   }
 ]

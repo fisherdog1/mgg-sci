@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
 
 /**
@@ -28,6 +29,7 @@ public abstract class CSVParser<T extends Legacy>
 	 */
 	public List<T> parse(File in) {
 		Scanner sc = null;
+		ArrayList<T> out = new ArrayList<T>();
 		
 		try {
 			sc = new Scanner(in);
@@ -35,12 +37,24 @@ public abstract class CSVParser<T extends Legacy>
 			throw new RuntimeException(e);
 		}
 		
-		sc.useDelimiter("\n");
+		//Possible compatibility fix for test cases
+		sc.useDelimiter(Pattern.compile("[\\r\\n]+"));
+		
+		//Old delimiter (use for testing only)
+		//sc.useDelimiter("\n");
+				
+		//Search for number of lines
+		while (!sc.hasNextInt() && sc.hasNext())
+			sc.next();
+		
+		if (!sc.hasNext()) {
+			sc.close();
+			return out;
+		}
 		
 		int count = sc.nextInt();
-		int lines = 0;
 		
-		ArrayList<T> out = new ArrayList<T>(count);
+		int lines = 0;
 		
 		while (sc.hasNext()) {
 			String line = sc.next();
@@ -65,6 +79,7 @@ public abstract class CSVParser<T extends Legacy>
 			try {
 				out.add(parseLine(items));
 			} catch(DataFormatException e) {
+				sc.close();
 				throw new RuntimeException("Could not parse line %d: %s\nin file: %s\n".formatted(lines+1, line, in));
 			}		
 		}
@@ -73,6 +88,15 @@ public abstract class CSVParser<T extends Legacy>
 		
 		if (count != lines) {
 			throw new RuntimeException("Incorrect number of lines read, expected %d, read %d\n".formatted(count,lines));
+		}
+		
+		if (lines == 0) {
+			//print whole file
+			sc.reset();
+			while (sc.hasNext())
+				System.out.print(sc.next());
+		
+			throw new RuntimeException("No lines read in file %s, something is definitely wrong\n".formatted(in.getAbsolutePath()));
 		}
 		
 		return out;
