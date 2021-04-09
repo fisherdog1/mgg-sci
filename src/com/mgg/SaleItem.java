@@ -1,8 +1,5 @@
 package com.mgg;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
  * Each subclass of SaleItem should provide a method for determining total cost and tax, which will depend on 
  * the Product type. 

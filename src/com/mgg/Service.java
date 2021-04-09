@@ -1,7 +1,5 @@
 package com.mgg;
 
-import java.util.Map;
-
 /**
  * A service with a rate in cents per hour
  * @author azimuth

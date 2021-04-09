@@ -1,7 +1,5 @@
 package com.mgg;
 
-import java.util.Map;
-
 /**
  * New, Used, or GiftCard Product with a basePrice in cents
  * For gift cards, the base price is ignored and replaced with an amount from the individual sale information

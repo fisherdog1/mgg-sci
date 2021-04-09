@@ -1,7 +1,5 @@
 package com.mgg;
 
-import java.util.Map;
-
 public abstract class Product extends Legacy
 {
 	private String name;
