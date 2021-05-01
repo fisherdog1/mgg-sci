@@ -9,14 +9,28 @@ public class Service extends Product
 {
 	private int hourlyRate;
 	
+	//Required to be non-prototype
+	private double hours;
+	private Person salesperson;
+	
 	public Service(String legacyId, String name, int hourlyRate) {
 		super(legacyId, name);
 		
 		this.hourlyRate = hourlyRate;
 	}
 	
-	public Service(String legacyId) {
-		super(legacyId);
+	public Service(String legacyId, String name, int hourlyRate, double hours, Person salesperson) {
+		this(legacyId, name, hourlyRate);
+		
+		this.hours = hours;
+		this.salesperson = salesperson;
+	}
+	
+	public Service(Service prototype, double hours, Person salesperson) {
+		this(prototype.getId(),prototype.getName(),prototype.getHourlyRate());
+		
+		this.hours = hours;
+		this.salesperson = salesperson;
 	}
 	
 	@Override
@@ -26,5 +40,24 @@ public class Service extends Product
 	
 	public int getHourlyRate() {
 		return this.hourlyRate;
+	}
+
+	public Person getSalesperson() {
+		return salesperson;
+	}
+	
+	@Override
+	public boolean isPlaceholder()
+	{
+		return (hours == 0);
+	}
+
+	@Override
+	public int getLineSubtotal() {
+		if (isPlaceholder())
+			throw new RuntimeException("Tried to calculate line total for prototype: %s\n".formatted(getName()));
+		
+		//TODO math
+		return (int)Math.round(hourlyRate*hours);
 	}
 }

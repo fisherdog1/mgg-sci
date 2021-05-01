@@ -25,12 +25,6 @@ public class Person extends Legacy
 		this.address = address;
 		
 		this.email = new ArrayList<String>(1);
-		this.setPlaceholder(false); //All legacy references handled
-	}
-	
-	public Person(String legacyId) {
-		this(legacyId, "Polly", "Placeholder", CustomerType.Customer, new StreetAddress());
-		this.setPlaceholder(true);
 	}
 	
 	public String getFirstName() {

@@ -9,7 +9,17 @@ public class Item extends Product
 {
 	private ProductType type;
 	private int basePrice;
+	
+	//Required to be non-prototype
+	private int quantity;
 
+	/**
+	 * Create a (prototype) Item. basePrice will be set to zero for gift cards
+	 * @param legacyId
+	 * @param name
+	 * @param type
+	 * @param basePrice
+	 */
 	public Item(String legacyId, String name, ProductType type, int basePrice) {
 		super(legacyId, name);
 		
@@ -17,10 +27,33 @@ public class Item extends Product
 		
 		if (type != ProductType.GiftCard)
 			this.basePrice = basePrice;
+		else
+			this.basePrice = 0;
 	}
 	
-	public Item(String legacyId) {
-		super(legacyId);
+//	public Item(String legacyId, String name, ProductType type, int basePrice, int quantity) {
+//		this(legacyId, name, type, basePrice);
+//		
+//		this.quantity = quantity;
+//	}
+	
+	/**
+	 * Create item from prototype. 
+	 * @param prototype
+	 * @param quantityBasePrice A quantity for non gift card items, an amount in cents for gift cards
+	 */
+	public Item(Item prototype, int quantityBasePrice) {
+		this(prototype.getId(), prototype.getName(), prototype.getProductType(), prototype.getBasePrice());
+		
+		if (prototype.getProductType() == ProductType.GiftCard) {
+			this.quantity = 1;
+			this.basePrice = quantityBasePrice;
+		} else
+			this.quantity = quantityBasePrice;
+	}
+	
+	public boolean isPlaceholder() {
+		return (quantity == 0 && getProductType() != ProductType.GiftCard) || getBasePrice() == 0;
 	}
 	
 	public ProductType getProductType() {
@@ -32,14 +65,20 @@ public class Item extends Product
 		return 0.0725;
 	}
 	
-	/**
-	 * Return base price modified by ProductType only, applies used discount
-	 * @return
-	 */
-	public double getBasePrice() {
-		if (this.type == ProductType.Used)
-			return Math.round(0.8 * (double)basePrice);
+	public int getBasePrice() {
+		return basePrice;
+	}
+
+	@Override
+	public int getLineSubtotal() {
+		if (isPlaceholder())
+			throw new RuntimeException("Tried to calculate line total for prototype: %s\n".formatted(getName()));
+		
+		if (getProductType() == ProductType.GiftCard)
+			return (int)Math.round(getBasePrice() * quantity);
+		else if (getProductType() == ProductType.Used)
+			return (int)Math.round(getBasePrice() * 0.8 * quantity);
 		else
-			return basePrice;
+			return getBasePrice();
 	}
 }

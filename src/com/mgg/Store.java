@@ -9,9 +9,9 @@ public class Store extends Legacy
 		super(legacyId);
 	}
 	
-	public Store(String legacyId, String managerId, StreetAddress address) {
+	public Store(String legacyId, Person manager, StreetAddress address) {
 		this(legacyId);
-		this.manager = new Person(managerId);
+		this.manager = manager;
 		this.address = address;
 	}
 	
@@ -20,10 +20,6 @@ public class Store extends Legacy
 	}
 	
 	public void setManager(Person manager) {
-		//TODO: this shouldn't be handled here?
-		if (manager.isPlaceholder() == false)
-			this.setPlaceholder(false);
-		
 		this.manager = manager;
 	}
 	

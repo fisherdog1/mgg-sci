@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Sale corresponds to one transaction and contains SaleItems which define each line item
+ * A Sale corresponds to one transaction and contains non-prototype Product s which define each line item
  * @author azimuth
  *
  */
@@ -13,27 +13,18 @@ public class Sale extends Legacy
 	private Store store;
 	private Person customer;
 	private Person salesperson;
-	private List<SaleItem<?>> items;
+	private List<Product> items;
 	
-	public Sale(String legacyId, String storeId, String customerId, String salespersonId) {
+	public Sale(String legacyId, Store store, Person customer, Person salesperson) {
 		super(legacyId);
-		this.store = new Store(storeId);
-		this.customer = new Person(customerId);
-		this.salesperson = new Person(salespersonId);
-		items = new ArrayList<SaleItem<?>>();
-	}
-	
-	private void updatePlaceholderStatus() {
-		if (store.isPlaceholder() || customer.isPlaceholder() || salesperson.isPlaceholder())
-			return;
+		this.store = store;
+		this.customer = customer;
 		
-		if (!items.isEmpty()) {
-			for (SaleItem<?> si : items)
-				if (si.getProduct().isPlaceholder())
-					return;
-		}
+		if (salesperson.getType() != CustomerType.Employee)
+			throw new RuntimeException("Person %s is not an employee\n".formatted(salesperson.getFullNameFormal()));
 		
-		setPlaceholder(false);
+		this.salesperson = salesperson;
+		items = new ArrayList<Product>();
 	}
 	
 	public Store getStore() {
@@ -42,7 +33,6 @@ public class Sale extends Legacy
 	
 	public void setStore(Store store) {
 		this.store = store;
-		updatePlaceholderStatus();
 	}
 
 	public Person getCustomer() {
@@ -51,7 +41,6 @@ public class Sale extends Legacy
 	
 	public void setCustomer(Person customer) {
 		this.customer = customer;
-		updatePlaceholderStatus();
 	}
 	
 	public Person getSalesperson() {
@@ -60,19 +49,20 @@ public class Sale extends Legacy
 	
 	public void setSalesperson(Person salesperson) {
 		this.salesperson = salesperson;
-		updatePlaceholderStatus();
 	}
 	
-	public void addItem(SaleItem<?> item) {
+	public void addItem(Product item) {
+		if (item.isPlaceholder())
+			throw new RuntimeException("Cannot add prototype item to Sale: %s\n".formatted(item.getName()));
+		
 		items.add(item);
-		updatePlaceholderStatus();
 	}
 	
 	/**
 	 * Return the items list
 	 * @return
 	 */
-	public List<SaleItem<?>> getItems() {
+	public List<Product> getItems() {
 		return items;
 	}
 
@@ -83,8 +73,8 @@ public class Sale extends Legacy
 	public int getSubtotal()
 	{
 		int total = 0;
-		for (SaleItem<?> si : items)
-			total += si.getSalePrice();
+		for (Product si : items)
+			total += si.getLineSubtotal();
 		
 		return total;
 	}
@@ -95,8 +85,8 @@ public class Sale extends Legacy
 	 */
 	public int getTax() {
 		int total = 0;
-		for (SaleItem<?> si : items)
-			total += si.getTax();
+		for (Product si : items)
+			total += si.getLineTax();
 		
 		return total;	
 	}
@@ -107,8 +97,8 @@ public class Sale extends Legacy
 	 */
 	public int getSubtotalTax() {
 		int total = 0;
-		for (SaleItem<?> si : items)
-			total += si.getTotalPrice();
+		for (Product si : items)
+			total += si.getLineTotal();
 		
 		return total;	
 	}

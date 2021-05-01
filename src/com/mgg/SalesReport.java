@@ -50,55 +50,6 @@ public class SalesReport implements ProductClassProvider
 		return null;
 	}
 	
-	/**
-	 * Searches the list of entities for objects that fit the passed Legacy's placeholders
-	 * TODO: this uses a binary search and so only has defined behavior when the list is sorted, check before running
-	 * @param leg
-	 */
-	public void updateAssociation(Legacy leg) {
-		
-		//TODO: there has to be a generic way to do this
-		
-		if (leg instanceof Store) {
-			if (((Store) leg).getManager().isPlaceholder()) {
-				Person mgr = (Person)findById(((Store) leg).getManager().getId());
-				if (mgr != null)
-					((Store) leg).setManager(mgr);
-			}
-				
-		} else if (leg instanceof Sale) {
-			if (((Sale) leg).getStore().isPlaceholder()) {
-				Store store = (Store)findById(((Sale) leg).getStore().getId());
-				if (store != null)
-					((Sale) leg).setStore(store);
-			}
-			
-			if (((Sale) leg).getCustomer().isPlaceholder()) {
-				Person cust = (Person)findById(((Sale) leg).getCustomer().getId());
-				if (cust != null)
-					((Sale) leg).setCustomer(cust);
-			}
-			
-			if (((Sale) leg).getSalesperson().isPlaceholder()) {
-				Person salesp = (Person)findById(((Sale) leg).getSalesperson().getId());
-				if (salesp != null)
-					((Sale) leg).setSalesperson(salesp);
-			}
-			
-			for (SaleItem item : ((Sale) leg).getItems()) {
-				item.setProduct((Product)findById(item.getProduct().getId()));
-			}
-		}
-	}
-	
-	/**
-	 * Updates references in each Legacy entity so they are not placeholders
-	 */
-	public void updateAllAssociations() {
-		for (Legacy l : all) 
-			updateAssociation(l);
-	}
-	
 	private class SalespersonReportRow {
 		public Person salesperson;
 		public int sales;
@@ -230,46 +181,44 @@ public class SalesReport implements ProductClassProvider
 				int subtotal = s.getSubtotal();
 				int totalTax = s.getTax();
 				
-				for (SaleItem<?> si : s.getItems()) {
+				for (Product si : s.getItems()) {
 					
-					System.out.printf("%-48s\n", si.getProduct().getName());
-					System.out.printf("%10s ", si.getProduct().getId());
+					System.out.printf("%-48s\n", si.getName());
+					System.out.printf("%10s ", si.getId());
 					
 					String detail = "";
 					
-					if (si.getProduct() instanceof Item) {
-						Item i = (Item)si.getProduct();
+					if (si instanceof Item) {
+						Item i = (Item)si;
 						
 						//TODO: move this?
 						//TODO: clean this for sure
 						
 						if (i.getProductType() == ProductType.New) {
-							detail = "(New Item) @$%d.%02d/ea".formatted((int)si.getSalePrice()/100, (int)si.getSalePrice()%100);
+							detail = "(New Item) @$%d.%02d/ea".formatted((int)si.getLineSubtotal()/100, (int)si.getLineSubtotal()%100);
 						} else if (i.getProductType() == ProductType.Used) {
-							detail = "(Used Item) @$%d.%02d/ea".formatted((int)si.getSalePrice()/100, (int)si.getSalePrice()%100);
+							detail = "(Used Item) @$%d.%02d/ea".formatted((int)si.getLineSubtotal()/100, (int)si.getLineSubtotal()%100);
 						} else if (i.getProductType() == ProductType.GiftCard) {
 							detail = "(Gift Card)";
 						}
 						
-					} else if (si.getProduct() instanceof Service) {
-						Service sv = (Service)si.getProduct();
+					} else if (si instanceof Service) {
+						Service sv = (Service)si;
 						
-						int price = si.getSalePrice();
-						String salespersonId = ((ServiceSaleItem)si).getServicepersonId();
-						String salespersonName = ((Person)findById(salespersonId)).getFullNameFormal();
+						int price = si.getLineSubtotal();
 					
-						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(salespersonId, salespersonName, price/100, price%100);
+						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(sv.getSalesperson().getId(), sv.getSalesperson().getFullNameFormal(), price/100, price%100);
 						
-					} else if (si.getProduct() instanceof Subscription) {
-						Subscription sc = (Subscription)si.getProduct();
+					} else if (si instanceof Subscription) {
+						Subscription sc = (Subscription)si;
 						
-						int days = (int)Math.round(((double)si.getSalePrice() / (double)sc.getAnnualFee()) * 365);
+						int days = (int)Math.round(((double)si.getLineSubtotal() / (double)sc.getAnnualFee()) * 365);
 						
 						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getAnnualFee()/100, sc.getAnnualFee()%100);
 						
 					}
 					
-					System.out.printf("%-64s $%4d.%02d\n",detail, si.getSalePrice()/100, si.getSalePrice()%100);
+					System.out.printf("%-64s $%4d.%02d\n",detail, si.getLineSubtotal()/100, si.getLineSubtotal()%100);
 				}
 				
 				System.out.printf("%74s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
@@ -286,19 +235,20 @@ public class SalesReport implements ProductClassProvider
 		
 		SalesReport sr = new SalesReport();
 		
+		//TODO replace this with load from database
+		//TODO this is the only valid order, enforce it somehow
 		sr.parseFile(new PersonParser(), new File("data/Persons.csv"));
-		sr.parseFile(new StoreParser(), new File("data/Stores.csv"));
 		sr.parseFile(new ProductParser(), new File("data/Items.csv"));
+		sr.parseFile(new StoreParser(sr), new File("data/Stores.csv"));
+		sr.parseFile(new SaleParser(sr), new File("data/Sales.csv"));
 		
-		//TODO: do this automatically when new items are added (tree structure?)
 		sr.all.sort(new LegacyComparator());
 		
-		sr.parseFile(new SaleParser(sr), new File("data/Sales.csv"));
-	
-		sr.updateAllAssociations();
 		
 		sr.salespersonSummaryReport();
 		sr.storeSummaryReport();
 		sr.detailSaleReport();
 	}
+
+
 }
