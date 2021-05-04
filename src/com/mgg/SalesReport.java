@@ -288,10 +288,9 @@ public class SalesReport implements ProductClassProvider
 		SalesData.addItem("foof10", "SV", "Repair2", 20.0);
 		SalesData.addItem("foof00", "SB", "NintendoPower2", 120.0);
 		SalesData.addSale("ffffff", "f6f6f6", "00ff7f", "00ff7f");
-		SalesData.addProductToSale("ffffff", "foof70", 1);
-		SalesData.addGiftCardToSale("ffffff", "foof20", 20.0);
 		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 2.0);
-		SalesData.addSubscriptionToSale("ffffff", "foof00", "2015-01-01", "2016-01-01");
+		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 1.5);
+		SalesData.addSubscriptionToSale("ffffff", "foof00", "2015-01-20", "2016-01-01");
 		
 //		sr.salespersonSummaryReport();
 //		sr.storeSummaryReport();

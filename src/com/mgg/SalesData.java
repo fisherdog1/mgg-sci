@@ -652,7 +652,6 @@ public class SalesData {
 		}
 	}
 
-	//TODO: do not add duplicates, add quantities instead
 	/**
 	 * Adds a particular product (new or used, identified by <code>itemCode</code>)
 	 * to a particular sale record (identified by <code>saleCode</code>) with the
@@ -694,25 +693,59 @@ public class SalesData {
 			Item prototype = new Item(itemCode, rs.getString("productName"), pt, rs.getInt("basePrice"));
 			Item lineItem = new Item(prototype, quantity);
 			
+			//Check for item already in sale
 			
-			//Add line (non prototype) Item
+			String st3 = "select count(i.productId) as count, i.quantity from Item i join Sale s on i.saleId = s.saleId where\n"
+					+ "	i.legacyId = ? and\n"
+					+ " i.saleId is not null and\n"
+					+ " i.quantity > 0;";
 			
-			String st2 = "insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?);";
-			
-			ps = con.prepareStatement(st2);
-			ps.setString(1, lineItem.getName());
-			ps.setString(2, lineItem.getId());
-			ps.setString(3, newUsed);
-			ps.setInt(4, lineItem.getBasePrice());
-			ps.setInt(5, saleId);
-			ps.setInt(6, quantity);
+			ps = con.prepareStatement(st3);
+			ps.setString(1, itemCode);
 			ps.execute();
+			
+			boolean duplicateLine = false;
+			
+			rs = ps.getResultSet();
+			rs.next();
+			int count = rs.getInt("count");
+			if (count > 0) {
+				duplicateLine = true;
+				quantity += rs.getInt("quantity");
+			}
+			
+			if (duplicateLine == false) {
+				//Add new line Item
+				
+				String st2 = "insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?);";
+				
+				ps = con.prepareStatement(st2);
+				ps.setString(1, lineItem.getName());
+				ps.setString(2, lineItem.getId());
+				ps.setString(3, newUsed);
+				ps.setInt(4, lineItem.getBasePrice());
+				ps.setInt(5, saleId);
+				ps.setInt(6, quantity);
+				ps.execute();
+			} else {
+				//Update quantity
+				String st2 = "update Item i set \n"
+						+ "	quantity = ? where\n"
+						+ "    i.saleId = ? and\n"
+						+ "	i.legacyId = ?;";
+				
+				ps = con.prepareStatement(st2);
+				ps.setInt(1, quantity);
+				ps.setInt(2, saleId);
+				ps.setString(3, itemCode);
+				ps.execute();
+			}
 			
 			commitAndClose(con);
 			
@@ -721,7 +754,6 @@ public class SalesData {
 		}
 	}
 
-	//TODO: If adding the same gift card, do not add duplicate, add basePrices instead
 	/**
 	 * Adds a particular gift card (identified by <code>itemCode</code>) to a
 	 * particular sale record (identified by <code>saleCode</code>) in the specified
@@ -734,6 +766,7 @@ public class SalesData {
 	public static void addGiftCardToSale(String saleCode, String itemCode, double amount) {
 		//Same as before
 		Connection con = obtainConnection();
+		amount *= 100; //Convert to cents
 		
 		int saleId = containsSale(con, saleCode);
 		if (saleId == -1)
@@ -752,26 +785,61 @@ public class SalesData {
 			rs.next();
 			
 			Item prototype = new Item(itemCode, rs.getString("productName"), ProductType.GiftCard, rs.getInt("basePrice"));
-			Item lineItem = new Item(prototype, 100*(int)amount);
+			Item lineItem = new Item(prototype, (int)amount);
 			
-			//Add line (non prototype) Item
+			//Check for gift card already in sale
 			
-			String st2 = "insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?);";
+			String st3 = "select count(i.productId) as count, i.basePrice from Item i join Sale s on i.saleId = s.saleId where\n"
+					+ "	i.legacyId = ? and\n"
+					+ " i.saleId is not null;";
 			
-			ps = con.prepareStatement(st2);
-			ps.setString(1, lineItem.getName());
-			ps.setString(2, lineItem.getId());
-			ps.setString(3, "card");
-			ps.setInt(4, lineItem.getBasePrice());
-			ps.setInt(5, saleId);
-			ps.setInt(6, 1); //Quantity = 1 for gift cards
+			ps = con.prepareStatement(st3);
+			ps.setString(1, itemCode);
 			ps.execute();
+			
+			boolean duplicateLine = false;
+			
+			rs = ps.getResultSet();
+			rs.next();
+			int count = rs.getInt("count");
+			if (count > 0) {
+				duplicateLine = true;
+				amount += rs.getInt("basePrice");
+			}
+			
+			//Add new line Item
+			
+			if (duplicateLine == false) {
+				String st2 = "insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?);";
+				
+				ps = con.prepareStatement(st2);
+				ps.setString(1, lineItem.getName());
+				ps.setString(2, lineItem.getId());
+				ps.setString(3, "card");
+				ps.setInt(4, lineItem.getBasePrice());
+				ps.setInt(5, saleId);
+				ps.setInt(6, 1); //Quantity = 1 for gift cards
+				ps.execute();
+				
+			} else {
+				//Update quantity
+				String st2 = "update Item i set \n"
+						+ "	basePrice = ? where\n"
+						+ " i.saleId = ? and\n"
+						+ "	i.legacyId = ?;";
+				
+				ps = con.prepareStatement(st2);
+				ps.setInt(1, (int)amount);
+				ps.setInt(2, saleId);
+				ps.setString(3, itemCode);
+				ps.execute();
+			}
 			
 			commitAndClose(con);
 			
@@ -780,7 +848,6 @@ public class SalesData {
 		}
 	}
 
-	//TODO: do not add duplicate Service, add hours instead
 	/**
 	 * Adds a particular service (identified by <code>itemCode</code>) to a
 	 * particular sale record (identified by <code>saleCode</code>) which
@@ -818,22 +885,58 @@ public class SalesData {
 			
 			Service prototype = new Service(itemCode, rs.getString("productName"), rs.getInt("baseRate"));
 			
-			//Add line (non prototype) Item
+			//Check for service already in sale
 			
-			String st2 = "insert into Service (productName, legacyId, baseRate, hours, salespersonId) values (\n"
-					+ "	?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?);";
+			String st3 = "select count(i.productId) as count, i.hours from Service i join Sale s on i.saleId = s.saleId where\n"
+					+ "	i.legacyId = ? and\n"
+					+ " i.saleId is not null;";
 			
-			ps = con.prepareStatement(st2);
-			ps.setString(1, prototype.getName());
-			ps.setString(2, itemCode);
-			ps.setInt(3, prototype.getHourlyRate());
-			ps.setFloat(4, (float)billedHours);
-			ps.setInt(5, salespersonId);
+			ps = con.prepareStatement(st3);
+			ps.setString(1, itemCode);
 			ps.execute();
+			
+			boolean duplicateLine = false;
+			
+			rs = ps.getResultSet();
+			rs.next();
+			int count = rs.getInt("count");
+			if (count > 0) {
+				duplicateLine = true;
+				billedHours += rs.getFloat("hours");
+			}
+			
+			//Add new line Item
+			
+			if (duplicateLine == false) {
+				String st2 = "insert into Service (productName, legacyId, baseRate, hours, salespersonId, saleId) values (\n"
+						+ "	?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?);";
+				
+				ps = con.prepareStatement(st2);
+				ps.setString(1, prototype.getName());
+				ps.setString(2, itemCode);
+				ps.setInt(3, prototype.getHourlyRate());
+				ps.setFloat(4, (float)billedHours);
+				ps.setInt(5, salespersonId);
+				ps.setInt(6, saleId);
+				ps.execute();
+			} else {
+				//Update hours
+				String st2 = "update Service s set \n"
+						+ "	hours = ? where\n"
+						+ " s.saleId = ? and\n"
+						+ "	s.legacyId = ?;";
+				
+				ps = con.prepareStatement(st2);
+				ps.setFloat(1, (float)billedHours);
+				ps.setInt(2, saleId);
+				ps.setString(3, itemCode);
+				ps.execute();
+			}
 			
 			commitAndClose(con);
 			
@@ -842,7 +945,6 @@ public class SalesData {
 		}
 	}
 
-	//TODO: do not add overlapping identical subscriptions
 	/**
 	 * Adds a particular subscription (identified by <code>itemCode</code>) to a
 	 * particular sale record (identified by <code>saleCode</code>) which
@@ -857,6 +959,9 @@ public class SalesData {
 	public static void addSubscriptionToSale(String saleCode, String itemCode, String startDate, String endDate) {
 		//Same as before
 		Connection con = obtainConnection();
+		
+		java.sql.Date start = java.sql.Date.valueOf(startDate);
+		java.sql.Date end = java.sql.Date.valueOf(endDate);
 		
 		int saleId = containsSale(con, saleCode);
 		if (saleId == -1)
@@ -874,26 +979,70 @@ public class SalesData {
 			ResultSet rs = ps.getResultSet();
 			rs.next();
 			
-			Subscription prototype = new Subscription(itemCode, rs.getString("productName"), rs.getInt("baseRate"));
+			String productName = rs.getString("productName"); //Need to save this
+			Subscription prototype = new Subscription(itemCode, productName, rs.getInt("baseRate"));
 			
-			//Add line (non prototype) Item
+			String st3 = "select count(i.productId) as count, i.startDate, i.endDate from Subscription i join Sale s on i.saleId = s.saleId where\n"
+					+ "	i.legacyId = ? and\n"
+					+ " i.saleId is not null;";
 			
-			String st2 = "insert into Subscription (productName, legacyId, saleId, baseRate, startDate, endDate) values (\n"
-					+ "	?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?,\n"
-					+ " ?);";
-			
-			ps = con.prepareStatement(st2);
-			ps.setString(1, rs.getString("productName"));
-			ps.setString(2, itemCode);
-			ps.setInt(3, saleId);
-			ps.setInt(4, prototype.getAnnualFee());
-			ps.setDate(5, java.sql.Date.valueOf(startDate));
-			ps.setDate(6, java.sql.Date.valueOf(endDate));
+			ps = con.prepareStatement(st3);
+			ps.setString(1, itemCode);
 			ps.execute();
+			
+			boolean duplicateLine = false;
+			
+			rs = ps.getResultSet();
+			rs.next();
+			int count = rs.getInt("count");
+			if (count > 0) {
+				java.sql.Date oldStart = rs.getDate("startDate");
+				java.sql.Date oldEnd = rs.getDate("endDate");
+				
+				duplicateLine = true;
+			
+				//Overlap dates
+				if (start.compareTo(oldStart) >= 0)
+					start = oldStart;
+				
+				if (end.compareTo(oldEnd) <= 0) 
+					end = oldEnd;
+			}
+			
+			//Add new line Item
+			
+			if (duplicateLine == false) {
+				String st2 = "insert into Subscription (productName, legacyId, saleId, baseRate, startDate, endDate) values (\n"
+						+ "	?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?,\n"
+						+ " ?);";
+				
+				ps = con.prepareStatement(st2);
+				ps.setString(1, productName);
+				ps.setString(2, itemCode);
+				ps.setInt(3, saleId);
+				ps.setInt(4, prototype.getAnnualFee());
+				ps.setDate(5, start);
+				ps.setDate(6, end);
+				ps.execute();
+			} else {
+				//Update dates
+				String st2 = "update Subscription s set \n"
+						+ "	startDate = ?,\n"
+						+ " endDate = ? where\n"
+						+ " s.saleId = ? and\n"
+						+ "	s.legacyId = ?;";
+				
+				ps = con.prepareStatement(st2);
+				ps.setDate(1, start);
+				ps.setDate(2, end);
+				ps.setInt(3, saleId);
+				ps.setString(4, itemCode);
+				ps.execute();
+			}
 			
 			commitAndClose(con);
 			

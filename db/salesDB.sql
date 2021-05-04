@@ -1,7 +1,7 @@
-drop table if exists Subscription; #Subscription
-drop table if exists Service; #Service
-drop table if exists Item; #New or used item
-drop table if exists Sale; #Sale
+drop table if exists Subscription;
+drop table if exists Service;
+drop table if exists Item;
+drop table if exists Sale;
 drop table if exists Store;
 drop table if exists PersonEmail;
 drop table if exists Person;
@@ -19,7 +19,7 @@ create table Address (
 
 create table Email (
 	emailId int not null primary key auto_increment,
-	address varchar(200) not null
+	address varchar(200) unique not null
 )engine=InnoDB,collate=latin1_general_cs;
 
 create table Person (
@@ -39,6 +39,9 @@ create table PersonEmail (
   foreign key (emailId) references Email(emailId),
   foreign key (personId) references Person(personId)
 )engine=InnoDB,collate=latin1_general_cs;
+
+alter table PersonEmail
+	add constraint personEmail_nodup unique(personId, emailId);
 
 create table Store (
 	storeId int not null primary key auto_increment,
@@ -73,6 +76,9 @@ create table Item (
 	quantity int
 )engine=InnoDB,collate=latin1_general_cs;
 
+alter table Item
+	add constraint item_nodup unique(saleId, legacyId);
+
 create table Service (
 	productId int not null primary key auto_increment,
     productName varchar(200) not null,
@@ -86,6 +92,9 @@ create table Service (
     foreign key (salespersonId) references Person(personId)
 )engine=InnoDB,collate=latin1_general_cs;
 
+alter table Service
+	add constraint service_nodup unique(saleId, legacyId);
+
 create table Subscription (
 	productId int not null primary key auto_increment,
     productName varchar(200) not null,
@@ -98,108 +107,7 @@ create table Subscription (
     endDate date
 )engine=InnoDB,collate=latin1_general_cs;
 
-select s.productName, s.baseRate from Subscription s where
-	s.legacyId = 'foof00';
-
-insert into Subscription (productName, legacyId, saleId, baseRate, startDate, endDate) values (
-	'TestSub',
-    'f7f7f7',
-    9,
-    100000,
-    '2015-01-20',
-    '2017-01-20');
-
-insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (
-    'iPod Nano',
-    'f00f70',
-    'new',
-    10000,
-    1,
-    1);
-
-insert into Sale (legacyId, storeId, customerId, salespersonId) values (
-	'ffffff',
-    3,
-    4,
-    4);
-
-insert into Subscription (productName, legacyId, baseRate, startDate, endDate) values (
-	'Nintendo Power',
-    'f1f2f3',
-	12000,
-    '2015-01-20',
-    '2017-01-20');
-
-insert into Service (productName, legacyId, baseRate, hours, salespersonId) values (
-	'Repair',
-    'f71452',
-    2000,
-    1.0,
-    1);
-
-insert into Address (street, city, state, zip, country) values (
-	'1 Havey Avenue',
-    'Cleveland',
-    'OH',
-    '44177', 
-    'US');
-    
-select count(e.emailId) as count from Email e where
-	e.address = 'nmichelotti1@sbwire.com';
-    
-insert into Email (address) values (
-	'testemail@gmail.com');
-    
-insert into Person (legacyId, firstName, lastName, customerType, addressId) values (
-	'00ff7f',
-    'Bobby',
-    'Tables',
-    'gold',
-    1);
-    
-select count(p.personId) as count, p.personId from Person p where
-	p.legacyId = '00ff7f' and
-    p.firstName = 'Bobby' and
-    p.lastName = 'Tables' and
-    p.customerType = 'gold';
-    
-insert into PersonEmail (personId, emailId) values (
-	1,
-    38);
-    
-select count(pe.personId) from PersonEmail pe where
-	pe.personId = 1 and
-    pe.emailId = 38;
-    
-select * from PersonEmail;
-select * from Address;
-select * from Sale;
-select * from Person;
-select * from Service;
-select * from Subscription;
-select * from Item;
-
-select i.productName, i.newUsed, i.basePrice from Item i where
-	i.legacyId = 'foof70';
-
-select count(a.addressId) as count, a.addressId from Address a where
-	a.street = '1337 Havey Avenue' and
-    a.city = 'Cleveland' and
-    a.state = 'OH' and
-    a.zip = '44177' and
-    a.country = 'US';
-    
-insert into Store (legacyId, managerId, addressId) values (
-	'f6f6f6',
-    1,
-    1);
-    
-insert into Item (productName, legacyId, newUsed, basePrice, quantity) values (
-    'iPod Nano',
-    'f00f70',
-    'new',
-    10000,
-    0);
-    
-select count(s.storeId) as count, s.storeId from Store s where
-	s.legacyId = 'f6f6f6';
+#Technically this should stop subscriptions from overlapping and allow
+#duplicates otherwise. Not sure how to do this.
+alter table Subscription
+	add constraint subscription_nodup unique(saleId, legacyId);
