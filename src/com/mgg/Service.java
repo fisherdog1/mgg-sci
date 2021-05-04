@@ -17,6 +17,7 @@ public class Service extends Product
 		super(legacyId, name);
 		
 		this.hourlyRate = hourlyRate;
+		this.hours = 0.0;
 	}
 	
 	public Service(String legacyId, String name, int hourlyRate, double hours, Person salesperson) {
@@ -44,6 +45,10 @@ public class Service extends Product
 
 	public Person getSalesperson() {
 		return salesperson;
+	}
+	
+	public double getHours() {
+		return hours;
 	}
 	
 	@Override

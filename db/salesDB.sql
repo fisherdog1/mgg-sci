@@ -64,7 +64,7 @@ create table Sale (
 create table Item (
 	productId int not null primary key auto_increment,
     productName varchar(200) not null,
-    legacyId varchar(200) unique not null,
+    legacyId varchar(200) not null,
     saleId int, #Null indicates prototype
     foreign key (saleId) references Sale(saleId),
     
@@ -76,7 +76,7 @@ create table Item (
 create table Service (
 	productId int not null primary key auto_increment,
     productName varchar(200) not null,
-    legacyId varchar(200) unique not null,
+    legacyId varchar(200) not null,
     saleId int, #Null indicates prototype
     foreign key (saleId) references Sale(saleId),
     
@@ -89,7 +89,7 @@ create table Service (
 create table Subscription (
 	productId int not null primary key auto_increment,
     productName varchar(200) not null,
-    legacyId varchar(200) unique not null,
+    legacyId varchar(200) not null,
     saleId int, #Null indicates prototype
     foreign key (saleId) references Sale(saleId),
     
@@ -97,6 +97,25 @@ create table Subscription (
 	startDate date,
     endDate date
 )engine=InnoDB,collate=latin1_general_cs;
+
+select s.productName, s.baseRate from Subscription s where
+	s.legacyId = 'foof00';
+
+insert into Subscription (productName, legacyId, saleId, baseRate, startDate, endDate) values (
+	'TestSub',
+    'f7f7f7',
+    9,
+    100000,
+    '2015-01-20',
+    '2017-01-20');
+
+insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (
+    'iPod Nano',
+    'f00f70',
+    'new',
+    10000,
+    1,
+    1);
 
 insert into Sale (legacyId, storeId, customerId, salespersonId) values (
 	'ffffff',
@@ -159,6 +178,9 @@ select * from Person;
 select * from Service;
 select * from Subscription;
 select * from Item;
+
+select i.productName, i.newUsed, i.basePrice from Item i where
+	i.legacyId = 'foof70';
 
 select count(a.addressId) as count, a.addressId from Address a where
 	a.street = '1337 Havey Avenue' and

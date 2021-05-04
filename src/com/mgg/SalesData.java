@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * Database interface class
@@ -651,6 +652,7 @@ public class SalesData {
 		}
 	}
 
+	//TODO: do not add duplicates, add quantities instead
 	/**
 	 * Adds a particular product (new or used, identified by <code>itemCode</code>)
 	 * to a particular sale record (identified by <code>saleCode</code>) with the
@@ -671,22 +673,55 @@ public class SalesData {
 		
 		try {
 			//Look in Item table for itemCode
-			String st1 = "";
+			String st1 = "select i.productName, i.newUsed, i.basePrice from Item i where\n"
+					+ "	i.legacyId = ?;";
 			
 			PreparedStatement ps = con.prepareStatement(st1);
+			ps.setString(1, itemCode);
+			ps.execute();
+
+			ResultSet rs = ps.getResultSet();
+			rs.next();
+			
+			String newUsed = rs.getString("newUsed");
+			ProductType pt;
+			
+			if (newUsed.equals("new"))
+				pt = ProductType.New;
+			else
+				pt = ProductType.Used;
+			
+			Item prototype = new Item(itemCode, rs.getString("productName"), pt, rs.getInt("basePrice"));
+			Item lineItem = new Item(prototype, quantity);
 			
 			
+			//Add line (non prototype) Item
 			
+			String st2 = "insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?);";
 			
-			
-			String st2 = "";
 			ps = con.prepareStatement(st2);
+			ps.setString(1, lineItem.getName());
+			ps.setString(2, lineItem.getId());
+			ps.setString(3, newUsed);
+			ps.setInt(4, lineItem.getBasePrice());
+			ps.setInt(5, saleId);
+			ps.setInt(6, quantity);
+			ps.execute();
+			
+			commitAndClose(con);
 			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
 		}
 	}
 
+	//TODO: If adding the same gift card, do not add duplicate, add basePrices instead
 	/**
 	 * Adds a particular gift card (identified by <code>itemCode</code>) to a
 	 * particular sale record (identified by <code>saleCode</code>) in the specified
@@ -698,8 +733,54 @@ public class SalesData {
 	 */
 	public static void addGiftCardToSale(String saleCode, String itemCode, double amount) {
 		//Same as before
+		Connection con = obtainConnection();
+		
+		int saleId = containsSale(con, saleCode);
+		if (saleId == -1)
+			return; //Sale not present
+		
+		try {
+			//Look in Item table for itemCode
+			String st1 = "select i.productName, i.newUsed, i.basePrice from Item i where\n"
+					+ "	i.legacyId = ?;";
+			
+			PreparedStatement ps = con.prepareStatement(st1);
+			ps.setString(1, itemCode);
+			ps.execute();
+
+			ResultSet rs = ps.getResultSet();
+			rs.next();
+			
+			Item prototype = new Item(itemCode, rs.getString("productName"), ProductType.GiftCard, rs.getInt("basePrice"));
+			Item lineItem = new Item(prototype, 100*(int)amount);
+			
+			//Add line (non prototype) Item
+			
+			String st2 = "insert into Item (productName, legacyId, newUsed, basePrice, saleId, quantity) values (\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?);";
+			
+			ps = con.prepareStatement(st2);
+			ps.setString(1, lineItem.getName());
+			ps.setString(2, lineItem.getId());
+			ps.setString(3, "card");
+			ps.setInt(4, lineItem.getBasePrice());
+			ps.setInt(5, saleId);
+			ps.setInt(6, 1); //Quantity = 1 for gift cards
+			ps.execute();
+			
+			commitAndClose(con);
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception",e);
+		}
 	}
 
+	//TODO: do not add duplicate Service, add hours instead
 	/**
 	 * Adds a particular service (identified by <code>itemCode</code>) to a
 	 * particular sale record (identified by <code>saleCode</code>) which
@@ -713,8 +794,55 @@ public class SalesData {
 	 */
 	public static void addServiceToSale(String saleCode, String itemCode, String employeeCode, double billedHours) {
 		//Same as before
+		Connection con = obtainConnection();
+		
+		int saleId = containsSale(con, saleCode);
+		if (saleId == -1)
+			return; //Sale not present
+		
+		int salespersonId = containsPerson(con, employeeCode);
+		if (salespersonId == -1)
+			return; //salesperson Person not present
+		
+		try {
+			//Look in Item table for itemCode
+			String st1 = "select s.productName, s.baseRate from Service s where\n"
+					+ "	s.legacyId = ?;";
+			
+			PreparedStatement ps = con.prepareStatement(st1);
+			ps.setString(1, itemCode);
+			ps.execute();
+
+			ResultSet rs = ps.getResultSet();
+			rs.next();
+			
+			Service prototype = new Service(itemCode, rs.getString("productName"), rs.getInt("baseRate"));
+			
+			//Add line (non prototype) Item
+			
+			String st2 = "insert into Service (productName, legacyId, baseRate, hours, salespersonId) values (\n"
+					+ "	?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?);";
+			
+			ps = con.prepareStatement(st2);
+			ps.setString(1, prototype.getName());
+			ps.setString(2, itemCode);
+			ps.setInt(3, prototype.getHourlyRate());
+			ps.setFloat(4, (float)billedHours);
+			ps.setInt(5, salespersonId);
+			ps.execute();
+			
+			commitAndClose(con);
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception",e);
+		}
 	}
 
+	//TODO: do not add overlapping identical subscriptions
 	/**
 	 * Adds a particular subscription (identified by <code>itemCode</code>) to a
 	 * particular sale record (identified by <code>saleCode</code>) which
@@ -728,7 +856,49 @@ public class SalesData {
 	 */
 	public static void addSubscriptionToSale(String saleCode, String itemCode, String startDate, String endDate) {
 		//Same as before
+		Connection con = obtainConnection();
+		
+		int saleId = containsSale(con, saleCode);
+		if (saleId == -1)
+			return; //Sale not present
+		
+		try {
+			//Look in Item table for itemCode
+			String st1 = "select s.productName, s.baseRate from Subscription s where\n"
+					+ "	s.legacyId = ?;";
+			
+			PreparedStatement ps = con.prepareStatement(st1);
+			ps.setString(1, itemCode);
+			ps.execute();
+
+			ResultSet rs = ps.getResultSet();
+			rs.next();
+			
+			Subscription prototype = new Subscription(itemCode, rs.getString("productName"), rs.getInt("baseRate"));
+			
+			//Add line (non prototype) Item
+			
+			String st2 = "insert into Subscription (productName, legacyId, saleId, baseRate, startDate, endDate) values (\n"
+					+ "	?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?,\n"
+					+ " ?);";
+			
+			ps = con.prepareStatement(st2);
+			ps.setString(1, rs.getString("productName"));
+			ps.setString(2, itemCode);
+			ps.setInt(3, saleId);
+			ps.setInt(4, prototype.getAnnualFee());
+			ps.setDate(5, java.sql.Date.valueOf(startDate));
+			ps.setDate(6, java.sql.Date.valueOf(endDate));
+			ps.execute();
+			
+			commitAndClose(con);
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception",e);
+		}
 	}
-
-
 }
