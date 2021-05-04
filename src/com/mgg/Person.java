@@ -51,6 +51,22 @@ public class Person extends Legacy implements IAddress
 		return type;
 	}
 	
+	public String getCustomerTypeLetter() {
+		CustomerType t = getType();
+		String letter;
+		
+		if (t == CustomerType.Employee)
+			letter = "E";
+		else if (t == CustomerType.Platinum)
+			letter = "P";
+		else if (t == CustomerType.Gold)
+			letter = "G";
+		else
+			letter = "C";
+		
+		return letter;
+	}
+	
 	public void setType(CustomerType type) {
 		this.type = type;
 	}

@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 /**
  * Database interface class
@@ -919,7 +918,7 @@ public class SalesData {
 				ps = con.prepareStatement(st2);
 				ps.setString(1, prototype.getName());
 				ps.setString(2, itemCode);
-				ps.setInt(3, prototype.getHourlyRate());
+				ps.setInt(3, prototype.getBasePrice());
 				ps.setFloat(4, (float)billedHours);
 				ps.setInt(5, salespersonId);
 				ps.setInt(6, saleId);
@@ -1024,7 +1023,7 @@ public class SalesData {
 				ps.setString(1, productName);
 				ps.setString(2, itemCode);
 				ps.setInt(3, saleId);
-				ps.setInt(4, prototype.getAnnualFee());
+				ps.setInt(4, prototype.getBasePrice());
 				ps.setDate(5, start);
 				ps.setDate(6, end);
 				ps.execute();

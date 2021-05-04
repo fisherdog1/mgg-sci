@@ -1,6 +1,7 @@
 select * from PersonEmail;
 select * from Address;
 select * from Sale;
+select * from Store;
 select * from Person;
 select * from Service;
 select * from Subscription;

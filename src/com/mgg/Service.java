@@ -28,7 +28,7 @@ public class Service extends Product
 	}
 	
 	public Service(Service prototype, double hours, Person salesperson) {
-		this(prototype.getId(),prototype.getName(),prototype.getHourlyRate());
+		this(prototype.getId(),prototype.getName(),prototype.getBasePrice());
 		
 		this.hours = hours;
 		this.salesperson = salesperson;
@@ -39,7 +39,7 @@ public class Service extends Product
 		return 0.0285;
 	}
 	
-	public int getHourlyRate() {
+	public int getBasePrice() {
 		return this.hourlyRate;
 	}
 
@@ -49,6 +49,10 @@ public class Service extends Product
 	
 	public double getHours() {
 		return hours;
+	}
+	
+	public String getProductTypeString() {
+		return "SV";
 	}
 	
 	@Override

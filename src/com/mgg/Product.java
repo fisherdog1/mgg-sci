@@ -18,6 +18,10 @@ public abstract class Product extends Legacy
 		return getName();
 	}
 	
+	public abstract String getProductTypeString();
+	
+	public abstract int getBasePrice();
+	
 	/**
 	 * Can be overridden by subclasses which require a different rate
 	 * @return

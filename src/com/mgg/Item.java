@@ -61,6 +61,20 @@ public class Item extends Product
 		return type;
 	}
 	
+	public String getProductTypeString() {
+		ProductType t = getProductType();
+		String str;
+		
+		if (t == ProductType.New)
+			str = "PN";
+		if (t == ProductType.Used)
+			str = "PU";
+		else
+			str = "PG";
+		
+		return str;
+	}
+	
 	@Override
 	public double getTaxRate() {
 		return 0.0725;
@@ -81,5 +95,9 @@ public class Item extends Product
 			return (int)Math.round(getBasePrice() * 0.8 * quantity);
 		else
 			return getBasePrice();
+	}
+
+	public int getQuantity() {
+		return quantity;
 	}
 }

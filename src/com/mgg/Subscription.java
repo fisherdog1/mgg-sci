@@ -1,8 +1,5 @@
 package com.mgg;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
 /**
  * Annual Subscription with an annual rate in cents per year
  * No tax applied
@@ -12,8 +9,8 @@ public class Subscription extends Product
 	private int annualFee;
 	
 	//Required to be non-prototype
-	private LocalDate startDate;
-	private LocalDate endDate;
+	private String startDate;
+	private String endDate;
 	
 	public Subscription(String legacyId, String name, int annualFee) {
 		super(legacyId, name);
@@ -21,26 +18,30 @@ public class Subscription extends Product
 		this.annualFee = annualFee;
 	}
 	
-	public Subscription(String legacyId, String name, int annualFee, LocalDate startDate, LocalDate endDate) {
+	public Subscription(String legacyId, String name, int annualFee, String startDate, String endDate) {
 		this(legacyId, name, annualFee);
 		
 		this.startDate = startDate;
 		this.endDate = endDate;
 	}
 	
-	public Subscription(Subscription prototype, LocalDate startDate, LocalDate endDate) {
-		this(prototype.getId(), prototype.getName(), prototype.getAnnualFee());
+	public Subscription(Subscription prototype, String startDate, String endDate) {
+		this(prototype.getId(), prototype.getName(), prototype.getBasePrice());
 		
 		this.startDate = startDate;
 		this.endDate = endDate;
 	}
 	
-	public int getAnnualFee() {
+	public int getBasePrice() {
 		return this.annualFee;
 	}
 
 	public int getDurationDays() {
-		return (int)ChronoUnit.DAYS.between(startDate, endDate) + 1;
+		return java.sql.Date.valueOf(startDate).toLocalDate().until(java.sql.Date.valueOf(endDate).toLocalDate()).getDays();
+	}
+	
+	public String getProductTypeString() {
+		return "SB";
 	}
 	
 	@Override
@@ -55,5 +56,13 @@ public class Subscription extends Product
 	public boolean isPlaceholder()
 	{
 		return (startDate == null) || (endDate == null);
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
 	}
 }

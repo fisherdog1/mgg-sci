@@ -1,6 +1,5 @@
 package com.mgg;
 
-import java.time.LocalDate;
 import java.util.zip.DataFormatException;
 
 public class SaleParser extends CSVParser<Sale>
@@ -75,8 +74,8 @@ public class SaleParser extends CSVParser<Sale>
 				
 				i += 2;
 			} else if (classname.endsWith("Subscription")) { //is a date (subscription)
-				LocalDate startDate = LocalDate.parse(items[i+1]);
-				LocalDate endDate = LocalDate.parse(items[i+2]);
+				String startDate = items[i+1];
+				String endDate = items[i+2];
 				
 				Subscription prot = (Subscription)this.provider.findById(id);
 				

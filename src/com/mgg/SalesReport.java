@@ -34,6 +34,7 @@ public class SalesReport implements ProductClassProvider
 		}
 	}
 	
+	//TODO: replace with sorted ADT
 	List<Legacy> all;
 	
 	public SalesReport() {
@@ -220,9 +221,9 @@ public class SalesReport implements ProductClassProvider
 					} else if (si instanceof Subscription) {
 						Subscription sc = (Subscription)si;
 						
-						int days = (int)Math.round(((double)si.getLineSubtotal() / (double)sc.getAnnualFee()) * 365);
+						int days = (int)Math.round(((double)si.getLineSubtotal() / (double)sc.getBasePrice()) * 365);
 						
-						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getAnnualFee()/100, sc.getAnnualFee()%100);
+						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getBasePrice()/100, sc.getBasePrice()%100);
 						
 					}
 					
@@ -245,6 +246,75 @@ public class SalesReport implements ProductClassProvider
 		this.parseFile(new StoreParser(this), new File(stores));
 		this.parseFile(new SaleParser(this), new File(sales));
 		this.all.sort(new LegacyComparator());
+	}
+	
+	/**
+	 * Load CSV data to database for testing
+	 */
+	public void commitExampleData() {
+		//TODO: Update to use ADT for dependency order sorting
+		for (Legacy l : all) {
+			if (l instanceof Person) {
+				Person p = (Person)l;
+				StreetAddress sa = p.getAddress();
+				
+				SalesData.addPerson(p.getId(), p.getCustomerTypeLetter(), p.getFirstName(), p.getLastName(), 
+						sa.getStreet(), sa.getCity(), sa.getState(), sa.getZip(), sa.getCountry());
+				
+				for (String email : p.getEmail())
+					SalesData.addEmail(p.getId(), email);
+			}
+		}
+		
+		for (Legacy l : all) {
+			if (l instanceof Store) {
+				Store s = (Store)l;
+				StreetAddress sa = s.getAddress();
+				
+				SalesData.addStore(s.getId(), s.getManager().getId(), 
+						sa.getStreet(), sa.getCity(), sa.getState(), sa.getZip(), sa.getCountry());
+			}
+		}
+		
+		for (Legacy l : all) {
+			if (l instanceof Product) {
+				Product p = (Product)l;
+				if (p.isPlaceholder())
+					SalesData.addItem(p.getId(), p.getProductTypeString(), p.getName(), ((double)p.getBasePrice())/100);
+			}
+		}
+		
+		for (Legacy l : all) {
+			if (l instanceof Sale) {
+				Sale s = (Sale)l;
+				SalesData.addSale(s.getId(), s.getStore().getId(), s.getCustomer().getId(), s.getSalesperson().getId());
+			}
+		}
+		
+		for (Legacy l : all) {
+			if (l instanceof Sale) {
+				Sale s = (Sale)l;
+				
+				for (Product p : s.getItems()) {
+					if (!p.isPlaceholder()) {
+						if (p instanceof Item) {
+							Item i = (Item)p;
+							SalesData.addProductToSale(s.getId(), i.getId(), i.getQuantity());
+							
+						} else if (p instanceof Service) {
+							Service sv = (Service)p;
+							SalesData.addServiceToSale(s.getId(), sv.getId(), sv.getSalesperson().getId(), sv.getHours());
+							
+						} else if (p instanceof Subscription) {
+							Subscription sb = (Subscription)p;
+							SalesData.addSubscriptionToSale(s.getId(), sb.getId(), sb.getStartDate(), sb.getEndDate());
+							
+						}
+					}
+				}
+				
+			}
+		}
 	}
 	
 	/**
@@ -275,22 +345,22 @@ public class SalesReport implements ProductClassProvider
 		SalesReport sr = new SalesReport();
 		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
 		
-		//Call a function to push all Person to the database
-		//sr.initDatabase();
-		//SalesData.addAddress("1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
+		
 		SalesData.clearDatabase();
-		SalesData.addPerson("00ff7f", "G", "Bobby", "Tables", "1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
-		SalesData.addEmail("00ff7f", "testemail2@gmail.com");
-		SalesData.addStore("f6f6f6", "00ff7f", "162 Bobus", "Omaha", "Nebraska", "68111", "US");
-		SalesData.addItem("foof70", "PN", "iPod Nano", 100.0);
-		SalesData.addItem("foof50", "PU", "iPod Touch", 50.0);
-		SalesData.addItem("foof20", "PG", "Fortnite $20", 0.0);
-		SalesData.addItem("foof10", "SV", "Repair2", 20.0);
-		SalesData.addItem("foof00", "SB", "NintendoPower2", 120.0);
-		SalesData.addSale("ffffff", "f6f6f6", "00ff7f", "00ff7f");
-		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 2.0);
-		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 1.5);
-		SalesData.addSubscriptionToSale("ffffff", "foof00", "2015-01-20", "2016-01-01");
+		sr.commitExampleData();
+		
+//		SalesData.addPerson("00ff7f", "G", "Bobby", "Tables", "1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
+//		SalesData.addEmail("00ff7f", "testemail2@gmail.com");
+//		SalesData.addStore("f6f6f6", "00ff7f", "162 Bobus", "Omaha", "Nebraska", "68111", "US");
+//		SalesData.addItem("foof70", "PN", "iPod Nano", 100.0);
+//		SalesData.addItem("foof50", "PU", "iPod Touch", 50.0);
+//		SalesData.addItem("foof20", "PG", "Fortnite $20", 0.0);
+//		SalesData.addItem("foof10", "SV", "Repair2", 20.0);
+//		SalesData.addItem("foof00", "SB", "NintendoPower2", 120.0);
+//		SalesData.addSale("ffffff", "f6f6f6", "00ff7f", "00ff7f");
+//		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 2.0);
+//		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 1.5);
+//		SalesData.addSubscriptionToSale("ffffff", "foof00", "2015-01-20", "2016-01-01");
 		
 //		sr.salespersonSummaryReport();
 //		sr.storeSummaryReport();
