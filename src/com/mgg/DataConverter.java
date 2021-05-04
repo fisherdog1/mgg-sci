@@ -36,12 +36,12 @@ public class DataConverter
 		//provided test input
 		
 		List<Person> personList = new PersonParser().parse(new File("data/Persons.csv"));
-		List<Store> storeList = new StoreParser().parse(new File("data/Stores.csv"));
+		//List<Store> storeList = new StoreParser().parse(new File("data/Stores.csv"));
 		List<Product> itemList = new ProductParser().parse(new File("data/Items.csv"));
 		
 
 		gsonWriteList(gson, new File("data/Persons.json"), personList);
-		gsonWriteList(gson, new File("data/Stores.json"), storeList);
+		//gsonWriteList(gson, new File("data/Stores.json"), storeList);
 		gsonWriteList(gson, new File("data/Items.json"), itemList);
 		
 		//additional test input

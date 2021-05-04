@@ -1,9 +1,17 @@
 package com.mgg;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Sales report generator, loads and associates Legacy entities (Store,Person,etc)
@@ -231,24 +239,58 @@ public class SalesReport implements ProductClassProvider
 		}
 	}
 	
+	public void loadCSVs(String persons, String items, String stores, String sales) {
+		this.parseFile(new PersonParser(), new File(persons));
+		this.parseFile(new ProductParser(), new File(items));
+		this.parseFile(new StoreParser(this), new File(stores));
+		this.parseFile(new SaleParser(this), new File(sales));
+		this.all.sort(new LegacyComparator());
+	}
+	
+	/**
+	 * Returns if the named database table is empty or non-existent
+	 * @param tableName
+	 * @return
+	 */
+	public boolean tableEmpty(String tableName, Connection con) {
+		
+		try {
+			String st = "select * from " + tableName + ";";
+			PreparedStatement checkTable = con.prepareStatement(st);
+			checkTable.execute();
+			
+			ResultSet rs = checkTable.getResultSet();
+			if (rs.next() == false)
+				return true;
+			else
+				return false;
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL exception in tableEmpty",e);
+		}
+	}
+	
 	public static void main(String[] args) {
 		
 		SalesReport sr = new SalesReport();
+		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
 		
-		//TODO replace this with load from database
-		//TODO this is the only valid order, enforce it somehow
-		sr.parseFile(new PersonParser(), new File("data/Persons.csv"));
-		sr.parseFile(new ProductParser(), new File("data/Items.csv"));
-		sr.parseFile(new StoreParser(sr), new File("data/Stores.csv"));
-		sr.parseFile(new SaleParser(sr), new File("data/Sales.csv"));
+		//Call a function to push all Person to the database
+		//sr.initDatabase();
+		//SalesData.addAddress("1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
+		SalesData.clearDatabase();
+		SalesData.addPerson("00ff7f", "G", "Bobby", "Tables", "1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
+		SalesData.addEmail("00ff7f", "testemail2@gmail.com");
+		SalesData.addStore("f6f6f6", "00ff7f", "162 Bobus", "Omaha", "Nebraska", "68111", "US");
+		SalesData.addItem("foof70", "PN", "iPod Nano", 100.0);
+		SalesData.addItem("foof50", "PU", "iPod Touch", 50.0);
+		SalesData.addItem("foof20", "PG", "Fortnite $20", 0.0);
+		SalesData.addItem("foof10", "SV", "Repair2", 20.0);
+		SalesData.addItem("foof00", "SB", "NintendoPower2", 120.0);
+		SalesData.addSale("ffffff", "f6f6f6", "00ff7f", "00ff7f");
 		
-		sr.all.sort(new LegacyComparator());
-		
-		
-		sr.salespersonSummaryReport();
-		sr.storeSummaryReport();
-		sr.detailSaleReport();
+//		sr.salespersonSummaryReport();
+//		sr.storeSummaryReport();
+//		sr.detailSaleReport();
 	}
-
-
 }

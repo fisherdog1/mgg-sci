@@ -1,6 +1,6 @@
 package com.mgg;
 
-public class Store extends Legacy
+public class Store extends Legacy implements IAddress
 {
 	private Person manager;
 	private StreetAddress address;

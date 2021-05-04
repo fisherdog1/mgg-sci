@@ -9,7 +9,7 @@ import java.util.List;
  * @author azimuth
  *
  */
-public class Person extends Legacy
+public class Person extends Legacy implements IAddress
 {
 	private String firstName;
 	private String lastName;

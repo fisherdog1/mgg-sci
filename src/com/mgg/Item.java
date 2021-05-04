@@ -53,6 +53,7 @@ public class Item extends Product
 	}
 	
 	public boolean isPlaceholder() {
+		//TODO: this correct?
 		return (quantity == 0 && getProductType() != ProductType.GiftCard) || getBasePrice() == 0;
 	}
 	
