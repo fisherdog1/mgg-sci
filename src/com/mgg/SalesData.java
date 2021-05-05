@@ -16,7 +16,7 @@ public class SalesData {
 	 * Caller is responsible for committing changes and closing the connection
 	 * @return
 	 */
-	private static Connection obtainConnection() {
+	static Connection obtainConnection() {
 		Connection con;
 		try {
 			con = DriverManager.getConnection(DatabaseInfo.URL, DatabaseInfo.USERNAME, DatabaseInfo.PASSWORD);
@@ -28,7 +28,7 @@ public class SalesData {
 		return con;
 	}
 	
-	private static void commitConnection(Connection con) {
+	static void commitConnection(Connection con) {
 		try {
 			con.commit();
 		} catch (SQLException e) {
@@ -36,7 +36,7 @@ public class SalesData {
 		}
 	}
 	
-	private static void commitAndClose(Connection con) {
+	static void commitAndClose(Connection con) {
 		commitConnection(con);
 		
 		try {
@@ -67,10 +67,10 @@ public class SalesData {
 				PreparedStatement ps = con.prepareStatement(s);
 				ps.execute();
 			}
-			
-			commitAndClose(con);
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -111,9 +111,10 @@ public class SalesData {
 				ps.execute();
 			}
 			
-			commitAndClose(con);
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		}  finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -161,26 +162,15 @@ public class SalesData {
 			ps.setString(1, personCode);
 			ps.setString(2, firstName);
 			ps.setString(3, lastName);
-			
-			String ctype;
-			
-			if (type.equals("E"))
-				ctype = "employee";
-			else if (type.equals("G"))
-				ctype = "gold";
-			else if (type.equals("P"))
-				ctype = "platinum";
-			else
-				ctype = "customer";
-			
-			ps.setString(4, ctype);
+			ps.setString(4, type);
 			ps.setInt(5, addressId);
 			
 			ps.execute();
-			commitAndClose(con);
 			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		}  finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -289,10 +279,11 @@ public class SalesData {
 			ps.setString(5, country);
 			
 			ps.execute();
-			commitAndClose(con);
 			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		}  finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 	
@@ -388,13 +379,11 @@ public class SalesData {
 			ps.setInt(1, personId);
 			ps.setInt(2, emailId);
 			ps.execute();
-			
-			commitAndClose(con);
-			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
-		
 	}
 
 	/**
@@ -482,10 +471,11 @@ public class SalesData {
 			ps.setInt(3, addressId);
 			
 			ps.execute();
-			commitAndClose(con);
 			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -522,17 +512,15 @@ public class SalesData {
 				ps = con.prepareStatement(st);
 				ps.setString(1, name);
 				ps.setString(2, itemCode);
+				ps.setString(3, type);
 				
-				if (type.equals("PN")) {
-					ps.setString(3, "new");
-					ps.setInt(4, 100*(int)(double)basePrice); //dumb
-				} else if (type.equals("PU")) {
-					ps.setString(3, "used");
-					ps.setInt(4, 100*(int)(double)basePrice);
-				} else { //PU
-					ps.setString(3, "card");
-					ps.setInt(4, 0);
-				}
+				if (type.equals("PN"))
+					ps.setInt(4, (int)(100*(double)basePrice)); //dumb
+				else if (type.equals("PU"))
+					ps.setInt(4, (int)(100*(double)basePrice));
+				else
+					ps.setInt(4, 0); //card
+
 					
 				ps.setInt(5, 0);
 				ps.execute();
@@ -547,7 +535,7 @@ public class SalesData {
 				ps = con.prepareStatement(st);
 				ps.setString(1, name);
 				ps.setString(2, itemCode);
-				ps.setInt(3, 100*(int)(double)basePrice);
+				ps.setInt(3, (int)(100*(double)basePrice));
 				ps.setFloat(4, 0.0f);
 				
 				ps.execute();
@@ -560,14 +548,15 @@ public class SalesData {
 				ps = con.prepareStatement(st);
 				ps.setString(1, name);
 				ps.setString(2, itemCode);
-				ps.setInt(3, 100*(int)(double)basePrice);
+				ps.setInt(3, (int)(100*(double)basePrice));
 				
 				ps.execute();
 			}
 			
-			commitAndClose(con);
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -643,11 +632,11 @@ public class SalesData {
 			ps.setInt(2, storeId);
 			ps.setInt(3, customerId);
 			ps.setInt(4, salespersonId);
-			
 			ps.execute();
-			commitAndClose(con);
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -684,7 +673,7 @@ public class SalesData {
 			String newUsed = rs.getString("newUsed");
 			ProductType pt;
 			
-			if (newUsed.equals("new"))
+			if (newUsed.equals("PN"))
 				pt = ProductType.New;
 			else
 				pt = ProductType.Used;
@@ -696,11 +685,11 @@ public class SalesData {
 			
 			String st3 = "select count(i.productId) as count, i.quantity from Item i join Sale s on i.saleId = s.saleId where\n"
 					+ "	i.legacyId = ? and\n"
-					+ " i.saleId is not null and\n"
-					+ " i.quantity > 0;";
+					+ " s.legacyId = ?;";
 			
 			ps = con.prepareStatement(st3);
 			ps.setString(1, itemCode);
+			ps.setString(2, saleCode);
 			ps.execute();
 			
 			boolean duplicateLine = false;
@@ -745,11 +734,10 @@ public class SalesData {
 				ps.setString(3, itemCode);
 				ps.execute();
 			}
-			
-			commitAndClose(con);
-			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -790,10 +778,11 @@ public class SalesData {
 			
 			String st3 = "select count(i.productId) as count, i.basePrice from Item i join Sale s on i.saleId = s.saleId where\n"
 					+ "	i.legacyId = ? and\n"
-					+ " i.saleId is not null;";
+					+ "	s.legacyId = ?;";
 			
 			ps = con.prepareStatement(st3);
 			ps.setString(1, itemCode);
+			ps.setString(2, saleCode);
 			ps.execute();
 			
 			boolean duplicateLine = false;
@@ -820,7 +809,7 @@ public class SalesData {
 				ps = con.prepareStatement(st2);
 				ps.setString(1, lineItem.getName());
 				ps.setString(2, lineItem.getId());
-				ps.setString(3, "card");
+				ps.setString(3, "PG");
 				ps.setInt(4, lineItem.getBasePrice());
 				ps.setInt(5, saleId);
 				ps.setInt(6, 1); //Quantity = 1 for gift cards
@@ -839,11 +828,10 @@ public class SalesData {
 				ps.setString(3, itemCode);
 				ps.execute();
 			}
-			
-			commitAndClose(con);
-			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -888,10 +876,11 @@ public class SalesData {
 			
 			String st3 = "select count(i.productId) as count, i.hours from Service i join Sale s on i.saleId = s.saleId where\n"
 					+ "	i.legacyId = ? and\n"
-					+ " i.saleId is not null;";
+					+ " s.legacyId = ?;";
 			
 			ps = con.prepareStatement(st3);
 			ps.setString(1, itemCode);
+			ps.setString(2, saleCode);
 			ps.execute();
 			
 			boolean duplicateLine = false;
@@ -936,11 +925,10 @@ public class SalesData {
 				ps.setString(3, itemCode);
 				ps.execute();
 			}
-			
-			commitAndClose(con);
-			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 
@@ -983,10 +971,11 @@ public class SalesData {
 			
 			String st3 = "select count(i.productId) as count, i.startDate, i.endDate from Subscription i join Sale s on i.saleId = s.saleId where\n"
 					+ "	i.legacyId = ? and\n"
-					+ " i.saleId is not null;";
+					+ " s.legacyId = ?;";
 			
 			ps = con.prepareStatement(st3);
 			ps.setString(1, itemCode);
+			ps.setString(2, saleCode);
 			ps.execute();
 			
 			boolean duplicateLine = false;
@@ -1042,11 +1031,10 @@ public class SalesData {
 				ps.setString(4, itemCode);
 				ps.execute();
 			}
-			
-			commitAndClose(con);
-			
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception",e);
+		} finally {
+			SalesData.commitAndClose(con);
 		}
 	}
 }

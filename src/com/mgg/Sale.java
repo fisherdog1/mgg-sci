@@ -1,5 +1,9 @@
 package com.mgg;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +56,7 @@ public class Sale extends Legacy
 	}
 	
 	public void addItem(Product item) {
-		if (item.isPlaceholder())
+		if (item.isPrototype())
 			throw new RuntimeException("Cannot add prototype item to Sale: %s\n".formatted(item.getName()));
 		
 		items.add(item);
@@ -109,6 +113,87 @@ public class Sale extends Legacy
 	 */
 	public int getGrandTotal() {
 		int total = this.getSubtotalTax();
-		return (int)Math.round(total * (1.0 - this.getCustomer().getCustomerDiscout()));
+		return (int)Math.round(total * (1.0 - this.getCustomer().getCustomerDiscount()));
+	}
+	
+	public static List<Sale> loadAllFromDatabase(LegacyProvider provider) {
+		List<Sale> sales = new ArrayList<Sale>();
+		
+		Connection con = SalesData.obtainConnection();
+		
+		try {
+			//Load sales from db
+			String st = "select s.legacyId as saleId, st.legacyId as storeId, cp.legacyId as customerId, sp.legacyId as salespersonId from \n"
+					+ "	Sale s\n"
+					+ " join Store st on s.storeId = st.storeId\n"
+					+ " join Person cp on s.customerId = cp.personId\n"
+					+ " join Person sp on s.salespersonId = sp.personId;";
+			PreparedStatement ps = con.prepareStatement(st);
+			ps.execute();
+			ResultSet rs = ps.getResultSet();
+
+			while (rs.next()) {
+				Person customer = (Person)provider.findById(rs.getString("customerId"));
+				Person salesperson = (Person)provider.findById(rs.getString("salespersonId"));
+				Store store = (Store)provider.findById(rs.getString("storeId"));
+				
+				Sale s = new Sale(rs.getString("saleId"), store, customer, salesperson);
+				
+				//Add each product to sale
+				
+				String st2 = "select i.legacyId, i.quantity, i.basePrice from Sale sale join Item i on sale.saleId = i.saleId where sale.legacyId = ?;";
+				PreparedStatement ps2 = con.prepareStatement(st2);
+				ps2.setString(1, rs.getString("saleId"));
+				ps2.execute();
+				ResultSet rs2 = ps2.getResultSet();
+				
+				while (rs2.next()) {
+					Item prototype = (Item)provider.findById(rs2.getString("legacyId"));
+					Item i;
+					
+					if (prototype.getProductType() == ProductType.GiftCard)
+						i = new Item(prototype, rs2.getInt("basePrice"));
+					else
+						i = new Item(prototype, rs2.getInt("quantity"));
+					
+					s.addItem(i);
+				}
+				
+				String st3 = "select s.legacyId, p.legacyId as salespersonId, s.hours from Sale sale \n"
+						+ "	join Service s on sale.saleId = s.saleId\n"
+						+ " join Person p on s.salespersonId = p.personId where sale.legacyId = ?;";
+				ps2 = con.prepareStatement(st3);
+				ps2.setString(1, rs.getString("saleId"));
+				ps2.execute();
+				rs2 = ps2.getResultSet();
+				
+				while (rs2.next()) {
+					Service sv = new Service((Service)provider.findById(rs2.getString("legacyId")),
+							rs2.getFloat("hours"),(Person)provider.findById(rs2.getString("salespersonId")));
+					s.addItem(sv);
+				}
+				
+				String st4 = "select s.legacyId, s.startDate, s.endDate from Sale sale join Subscription s on sale.saleId = s.saleId where sale.legacyId = ?;";
+				ps2 = con.prepareStatement(st4);
+				ps2.setString(1, rs.getString("saleId"));
+				ps2.execute();
+				rs2 = ps2.getResultSet();
+				
+				while (rs2.next()) {
+					Subscription sb = new Subscription((Subscription)provider.findById(rs2.getString("legacyId")),
+							rs2.getString("startDate"),rs2.getString("endDate"));
+					s.addItem(sb);
+				}
+				
+				sales.add(s);
+			}
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception opening connection",e);
+		} finally {
+			SalesData.commitAndClose(con);
+		}
+		
+		return sales;
 	}
 }

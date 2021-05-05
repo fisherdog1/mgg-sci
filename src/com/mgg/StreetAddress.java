@@ -1,5 +1,13 @@
 package com.mgg;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a street address as five potentially empty but non-null strings
  * TODO: implement comparable?
@@ -20,10 +28,6 @@ public class StreetAddress
 		this.state = state;
 		this.zip = zip;
 		this.country = country;
-	}
-	
-	public StreetAddress() {
-		this("Placeholder","","","","");
 	}
 
 	/**
@@ -69,5 +73,31 @@ public class StreetAddress
 	@Override
 	public String toString() {
 		return String.format("%s, %s %s, %s", street, city, state, zip);
+	}
+	
+	public static List<StreetAddress> loadAllFromDatabase() {
+		List<StreetAddress> addresses = new ArrayList<StreetAddress>();
+		
+		Connection con = SalesData.obtainConnection();
+		
+		try {
+			String st = "select street, city, state, zip, country from Address;";
+			PreparedStatement ps = con.prepareStatement(st);
+			ps.execute();
+			
+			ResultSet rs = ps.getResultSet();
+			
+			while (rs.next()) {
+				StreetAddress sa = new StreetAddress(rs.getString("street"),rs.getString("city"),
+						rs.getString("state"),rs.getString("zip"),rs.getString("country"));
+				
+				addresses.add(sa);
+			}
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception opening connection",e);
+		}
+		
+		return addresses;
 	}
 }

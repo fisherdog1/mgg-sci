@@ -1,12 +1,22 @@
 package com.mgg;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public abstract class Product extends Legacy
 {
 	private String name;
+	private boolean isPrototype; 
 	
 	public Product(String legacyId, String name) {
 		super(legacyId);
 		this.name = name;
+		this.isPrototype = true;
 	}
 	
 	public String getName() {
@@ -35,7 +45,13 @@ public abstract class Product extends Legacy
 	 * (fe it does not have all the information required to be a line item on a report)
 	 * @return
 	 */
-	public abstract boolean isPlaceholder();
+	public final boolean isPrototype() {
+		return isPrototype;
+	}
+	
+	protected final void clearPrototype() {
+		isPrototype = false;
+	}
 	
 	/**
 	 * Returns the total price for this line item excluding tax

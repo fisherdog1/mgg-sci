@@ -1,6 +1,11 @@
 package com.mgg;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -49,6 +54,20 @@ public class Person extends Legacy implements IAddress
 	
 	public CustomerType getType() {
 		return type;
+	}
+	
+	public static CustomerType stringToCustomerType(String s) {
+		
+		if (s.equals("E"))
+			return CustomerType.Employee;
+		else if (s.equals("P"))
+			return CustomerType.Platinum;
+		else if (s.equals("G"))
+			return CustomerType.Gold;
+		else if (s.equals("C"))
+			return CustomerType.Customer;
+		else
+			throw new RuntimeException("Bad customer type letter: %s".formatted(s));
 	}
 	
 	public String getCustomerTypeLetter() {
@@ -128,12 +147,52 @@ public class Person extends Legacy implements IAddress
 		return 0.00;
 	}
 	
-	public double getCustomerDiscout() {
+	public double getCustomerDiscount() {
 		return Person.getCustomerDiscount(getType());
 	}
 	
 	@Override
 	public String toString() {
 		return String.format("%s %s", firstName, lastName);
+	}
+
+	//TODO: needs to load emails
+	public static List<Person> loadAllFromDatabase() {
+		List<Person> persons = new ArrayList<Person>();
+		
+		Connection con = SalesData.obtainConnection();
+		
+		try {
+			String st = "select legacyId, firstName, lastName, customerType, addressId from Person;";
+			PreparedStatement ps = con.prepareStatement(st);
+			ps.execute();
+			
+			String st2 = "select street, city, state, zip, country from Address where addressId = ?;";
+			PreparedStatement ps2 = con.prepareStatement(st2);
+			
+			ResultSet rs = ps.getResultSet();
+			
+			while (rs.next()) {
+				CustomerType type = Person.stringToCustomerType(rs.getString("customerType"));
+				
+				ps2.setInt(1, rs.getInt("addressId"));
+				ps2.execute();
+				ResultSet rs2 = ps2.getResultSet();
+				rs2.next();
+				
+				StreetAddress sa = new StreetAddress(rs2.getString("street"), rs2.getString("city"), 
+						rs2.getString("state"), rs2.getString("zip"), rs2.getString("country"));
+				
+				Person p = new Person(rs.getString("legacyId"), rs.getString("firstName"), rs.getString("lastName"), type, sa);
+				persons.add(p);
+			}
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception opening connection",e);
+		} finally {
+			SalesData.commitAndClose(con);
+		}
+		
+		return persons;
 	}
 }

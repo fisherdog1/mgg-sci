@@ -27,7 +27,7 @@ create table Person (
   legacyId varchar(200) unique not null,
   firstName varchar(200) not null,
   lastName varchar(200) not null,
-  customerType ENUM('customer','gold','platinum','employee') not null,
+  customerType ENUM('C','G','P','E') not null,
   addressId int not null,
   foreign key (addressId) references Address(addressId)
 )engine=InnoDB,collate=latin1_general_cs;
@@ -71,7 +71,7 @@ create table Item (
     saleId int, #Null indicates prototype
     foreign key (saleId) references Sale(saleId),
     
-	newUsed ENUM('new','used','card'),
+	newUsed ENUM('PN','PU','PG'),
     basePrice int, #Base price in cents
 	quantity int
 )engine=InnoDB,collate=latin1_general_cs;

@@ -1,5 +1,12 @@
 package com.mgg;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A service with a rate in cents per hour
  * @author azimuth
@@ -20,18 +27,13 @@ public class Service extends Product
 		this.hours = 0.0;
 	}
 	
-	public Service(String legacyId, String name, int hourlyRate, double hours, Person salesperson) {
-		this(legacyId, name, hourlyRate);
-		
-		this.hours = hours;
-		this.salesperson = salesperson;
-	}
-	
 	public Service(Service prototype, double hours, Person salesperson) {
 		this(prototype.getId(),prototype.getName(),prototype.getBasePrice());
 		
 		this.hours = hours;
 		this.salesperson = salesperson;
+		
+		clearPrototype();
 	}
 	
 	@Override
@@ -54,19 +56,40 @@ public class Service extends Product
 	public String getProductTypeString() {
 		return "SV";
 	}
-	
-	@Override
-	public boolean isPlaceholder()
-	{
-		return (hours == 0);
-	}
 
 	@Override
 	public int getLineSubtotal() {
-		if (isPlaceholder())
+		if (isPrototype())
 			throw new RuntimeException("Tried to calculate line total for prototype: %s\n".formatted(getName()));
 		
 		//TODO math
 		return (int)Math.round(hourlyRate*hours);
+	}
+	
+	public static List<Service> loadAllFromDatabase() {
+		List<Service> services = new ArrayList<Service>();
+		
+		Connection con = SalesData.obtainConnection();
+		
+		try {
+			//Load stores from db
+			String st = "select s.legacyId, s.productName, s.baseRate from Service s where s.saleId is null;";
+			PreparedStatement ps = con.prepareStatement(st);
+			ps.execute();
+			
+			ResultSet rs = ps.getResultSet();
+
+			while (rs.next()) {
+				Service s = new Service(rs.getString("legacyId"),rs.getString("productName"),rs.getInt("baseRate"));
+				services.add(s);
+			}
+			
+		} catch (SQLException e) {
+			throw new RuntimeException("SQL Exception opening connection",e);
+		} finally {
+			SalesData.commitAndClose(con);
+		}
+		
+		return services;
 	}
 }

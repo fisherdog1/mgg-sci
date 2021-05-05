@@ -9,9 +9,9 @@ public class SaleParser extends CSVParser<Sale>
 	private final int COL_CUSTOMER = 2;
 	private final int COL_SALESPERSON = 3;
 	
-	ProductClassProvider provider;
+	LegacyProvider provider;
 	
-	public SaleParser(ProductClassProvider provider) {
+	public SaleParser(LegacyProvider provider) {
 		
 		this.provider = provider;
 	}
@@ -29,7 +29,7 @@ public class SaleParser extends CSVParser<Sale>
 
 		int i = 4;
 		
-		while (i+1 < items.length) {
+		while (i < items.length) {
 			//add SaleItems to sale
 			//First column per item will always be a LegacyID
 			
@@ -58,7 +58,7 @@ public class SaleParser extends CSVParser<Sale>
 				
 				i+=3;
 			} else if (classname.endsWith("Item") && giftCard) { //is a dollar amt (gift card)
-				int amt = (int)Math.round(Float.parseFloat(items[i+1]));
+				int amt = (int)(100*Float.parseFloat(items[i+1]));
 				
 				Item prot = (Item)this.provider.findById(id);
 				

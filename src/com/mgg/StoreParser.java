@@ -4,9 +4,9 @@ import java.util.zip.DataFormatException;
 
 public class StoreParser extends CSVParser<Store>
 {
-	ProductClassProvider provider;
+	LegacyProvider provider;
 	
-	public StoreParser(ProductClassProvider provider) {
+	public StoreParser(LegacyProvider provider) {
 		this.provider = provider;
 	}
 	

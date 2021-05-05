@@ -7,6 +7,8 @@ select * from Service;
 select * from Subscription;
 select * from Item;
 
+
+
 select count(i.productId) as count, i.startDate, i.endDate from Subscription i join Sale s on i.saleId = s.saleId where
 	i.legacyId = 'foof00' and
     i.saleId is not null;
@@ -17,8 +19,7 @@ update Subscription s set
     s.saleId = 10 and
 	s.legacyId = 'foof00';
 
-select s.productName, s.baseRate from Subscription s where
-	s.legacyId = 'foof00';
+select s.productName, s.newUsed, s.basePrice from Item s where s.saleId is null;
 
 select count(i.productId) as count, i.quantity from Item i join Sale s on i.saleId = s.saleId where
 	i.legacyId = 'foof70' and
@@ -48,6 +49,7 @@ update Service s set
 	s.legacyId = 'foof10';
     
 select * from Item i where i.saleId is not null;
+select * from Item;
 
 insert into Subscription (productName, legacyId, saleId, baseRate, startDate, endDate) values (
 	'TestSub',
@@ -140,6 +142,29 @@ insert into Item (productName, legacyId, newUsed, basePrice, quantity) values (
     'new',
     10000,
     0);
+
+select street, city, state, zip, country from Address where addressId = 120;
+select legacyId, firstName, lastName, customerType, addressId from Person;
+select s.legacyId as storeId, p.legacyId as managerId, s.addressId from Store s join Person p on s.managerId = p.personId;
+
+select i.legacyId, i.productName, i.basePrice, i.newUsed from Item i where i.saleId is null;
+select s.legacyId, s.productName, s.baseRate from Service s where s.saleId is null;
+
+select s.legacyId as saleId, st.legacyId as storeId, cp.legacyId as customerId, sp.legacyId as salespersonId from 
+	Sale s
+    join Store st on s.storeId = st.storeId
+    join Person cp on s.customerId = cp.personId
+    join Person sp on s.salespersonId = sp.personId;
     
+select i.legacyId, i.quantity from Sale sale join Item i on sale.saleId = i.saleId where sale.legacyId = 'S12';
+select s.legacyId, s.salespersonId, s.hours from Sale sale join Service s on sale.saleId = s.saleId where sale.legacyId = 'S12';
+select s.legacyId, s.startDate, s.endDate from Sale sale join Subscription s on sale.saleId = s.saleId where sale.legacyId = 'S12';
+
+select s.legacyId, s.salespersonId from Service s where s.saleId is not null;
+
+select s.legacyId, s.salespersonId, s.hours from Sale sale 
+	join Service s on sale.saleId = s.saleId
+    join Person p on s.salespersonId = p.personId where sale.legacyId = 'S12';
+
 select count(s.storeId) as count, s.storeId from Store s where
 	s.legacyId = 'f6f6f6';

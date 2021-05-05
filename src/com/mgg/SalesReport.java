@@ -19,7 +19,7 @@ import java.util.Map.Entry;
  * @author azimuth
  *
  */
-public class SalesReport implements ProductClassProvider
+public class SalesReport implements LegacyProvider
 {
 	/**
 	 * Compares two Legacy entities by their legacyID
@@ -49,14 +49,12 @@ public class SalesReport implements ProductClassProvider
 		//TODO: binary search stopped working when SaleParser was changed??
 		//int i = Collections.binarySearch(all, new Legacy(id), new LegacyComparator());
 		
-		for (Legacy l : all)
+		for (Legacy l : all) {
 			if (l.getId().equals(id))
 				return l;
+		}
 		
-//		if (i >= 0)
-//			return all.get(i);
-		
-		return null;
+		throw new RuntimeException("Failed to lookup legacyId %s".formatted(id));
 	}
 	
 	private class SalespersonReportRow {
@@ -91,7 +89,8 @@ public class SalesReport implements ProductClassProvider
 			if (l instanceof Person) {
 				Person p = (Person)l;
 				
-				rows.add(new SalespersonReportRow(p));
+				if (p.getCustomerTypeLetter().equals("E")) //TODO: no magic strings
+					rows.add(new SalespersonReportRow(p));
 			}
 		}
 		
@@ -172,6 +171,7 @@ public class SalesReport implements ProductClassProvider
 		System.out.printf("%-49s %-4d     $%4d.%02d\n\n","Total sales: ",totalSales, grandTotalCents/100, grandTotalCents%100);
 	}
 	
+	//TODO: service cost per hour and item cost per unit output is wrong (actually total)
 	public void detailSaleReport() {
 		for (Legacy l : all) {
 			if (l instanceof Sale) {
@@ -204,9 +204,11 @@ public class SalesReport implements ProductClassProvider
 						//TODO: clean this for sure
 						
 						if (i.getProductType() == ProductType.New) {
-							detail = "(New Item) @$%d.%02d/ea".formatted((int)si.getLineSubtotal()/100, (int)si.getLineSubtotal()%100);
+							int price = si.getBasePrice();
+							detail = "(New Item) @$%d.%02d/ea".formatted(price/100, price%100);
 						} else if (i.getProductType() == ProductType.Used) {
-							detail = "(Used Item) @$%d.%02d/ea".formatted((int)si.getLineSubtotal()/100, (int)si.getLineSubtotal()%100);
+							int price = (int)Math.round(si.getBasePrice()*0.8);
+							detail = "(Used Item) @$%d.%02d/ea".formatted(price/100, price%100);
 						} else if (i.getProductType() == ProductType.GiftCard) {
 							detail = "(Gift Card)";
 						}
@@ -214,14 +216,14 @@ public class SalesReport implements ProductClassProvider
 					} else if (si instanceof Service) {
 						Service sv = (Service)si;
 						
-						int price = si.getLineSubtotal();
+						int price = si.getBasePrice();
 					
 						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(sv.getSalesperson().getId(), sv.getSalesperson().getFullNameFormal(), price/100, price%100);
 						
 					} else if (si instanceof Subscription) {
 						Subscription sc = (Subscription)si;
 						
-						int days = (int)Math.round(((double)si.getLineSubtotal() / (double)sc.getBasePrice()) * 365);
+						int days = sc.getDurationDays();
 						
 						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getBasePrice()/100, sc.getBasePrice()%100);
 						
@@ -234,7 +236,8 @@ public class SalesReport implements ProductClassProvider
 				System.out.printf("%74s: $%4d.%02d\n", "Tax", totalTax/100, totalTax%100);
 
 				int discount = s.getSubtotalTax() - s.getGrandTotal();
-				System.out.printf("%65s (%05.2f%%): $%4d.%02d\n", "Discount", s.getCustomer().getCustomerDiscout()*100, discount/100, discount%100);
+				if (s.getCustomer().getCustomerDiscount() > 0.0)
+					System.out.printf("%65s (%05.2f%%): $%4d.%02d\n", "Discount", s.getCustomer().getCustomerDiscount()*100, discount/100, discount%100);
 				System.out.printf("%74s: $%4d.%02d\n\n","Grand Total", s.getGrandTotal()/100, s.getGrandTotal()%100);
 			}
 		}
@@ -279,7 +282,7 @@ public class SalesReport implements ProductClassProvider
 		for (Legacy l : all) {
 			if (l instanceof Product) {
 				Product p = (Product)l;
-				if (p.isPlaceholder())
+				if (p.isPrototype())
 					SalesData.addItem(p.getId(), p.getProductTypeString(), p.getName(), ((double)p.getBasePrice())/100);
 			}
 		}
@@ -296,10 +299,14 @@ public class SalesReport implements ProductClassProvider
 				Sale s = (Sale)l;
 				
 				for (Product p : s.getItems()) {
-					if (!p.isPlaceholder()) {
+					if (!p.isPrototype()) {
 						if (p instanceof Item) {
 							Item i = (Item)p;
-							SalesData.addProductToSale(s.getId(), i.getId(), i.getQuantity());
+							
+							if (i.getProductType() == ProductType.GiftCard)
+								SalesData.addGiftCardToSale(s.getId(), i.getId(), ((double)i.getBasePrice())/100.0); //function takes a dollars values basePrice is in cents
+							else
+								SalesData.addProductToSale(s.getId(), i.getId(), i.getQuantity());
 							
 						} else if (p instanceof Service) {
 							Service sv = (Service)p;
@@ -312,13 +319,13 @@ public class SalesReport implements ProductClassProvider
 						}
 					}
 				}
-				
 			}
 		}
 	}
 	
 	/**
 	 * Returns if the named database table is empty or non-existent
+	 * I don't remember what this is for
 	 * @param tableName
 	 * @return
 	 */
@@ -340,14 +347,28 @@ public class SalesReport implements ProductClassProvider
 		}
 	}
 	
+	public void loadAllFromDatabase() {
+		//this.all.addAll(StreetAddress.loadAllFromDatabase());
+		
+		//Load Person, Store, Product, Sale
+		this.all.addAll(Person.loadAllFromDatabase());
+		this.all.addAll(Store.loadAllFromDatabase(this));
+		this.all.addAll(Item.loadAllFromDatabase());
+		this.all.addAll(Service.loadAllFromDatabase());
+		this.all.addAll(Subscription.loadAllFromDatabase());
+		this.all.addAll(Sale.loadAllFromDatabase(this));
+	}
+	
 	public static void main(String[] args) {
 		
 		SalesReport sr = new SalesReport();
-		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
 		
+//		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
+//		
+//		SalesData.clearDatabase();
+//		sr.commitExampleData();
 		
-		SalesData.clearDatabase();
-		sr.commitExampleData();
+		sr.loadAllFromDatabase();
 		
 //		SalesData.addPerson("00ff7f", "G", "Bobby", "Tables", "1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
 //		SalesData.addEmail("00ff7f", "testemail2@gmail.com");
@@ -362,8 +383,8 @@ public class SalesReport implements ProductClassProvider
 //		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 1.5);
 //		SalesData.addSubscriptionToSale("ffffff", "foof00", "2015-01-20", "2016-01-01");
 		
-//		sr.salespersonSummaryReport();
-//		sr.storeSummaryReport();
-//		sr.detailSaleReport();
+		sr.salespersonSummaryReport();
+		sr.storeSummaryReport();
+		sr.detailSaleReport();
 	}
 }
