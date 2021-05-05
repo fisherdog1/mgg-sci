@@ -8,7 +8,7 @@ package com.mgg;
  * @author azimuth
  *
  */
-public abstract class Legacy
+public abstract class Legacy implements Comparable<Legacy>
 {
 	private String legacyId;
 	
@@ -22,5 +22,9 @@ public abstract class Legacy
 	 */
 	public String getId() {
 		return new String(legacyId);
+	}
+	
+	public int compareTo(Legacy o) {
+		return this.getId().compareTo(o.getId());
 	}
 }

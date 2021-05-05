@@ -7,7 +7,7 @@ select * from Service;
 select * from Subscription;
 select * from Item;
 
-
+select e.address from Email e join PersonEmail pe on e.emailId = pe.emailId join Person p on p.personId = pe.personId where p.legacyId = '0375b6';
 
 select count(i.productId) as count, i.startDate, i.endDate from Subscription i join Sale s on i.saleId = s.saleId where
 	i.legacyId = 'foof00' and

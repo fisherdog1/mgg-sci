@@ -14,7 +14,7 @@ import java.util.List;
  * @author azimuth
  *
  */
-public class StreetAddress
+public class StreetAddress implements Comparable<StreetAddress>
 {
 	private String street;
 	private String city;
@@ -73,6 +73,12 @@ public class StreetAddress
 	@Override
 	public String toString() {
 		return String.format("%s, %s %s, %s", street, city, state, zip);
+	}
+	
+	@Override
+	public int compareTo(StreetAddress o)
+	{
+		return this.toString().compareTo(o.toString());
 	}
 	
 	public static List<StreetAddress> loadAllFromDatabase() {

@@ -169,6 +169,11 @@ public class Person extends Legacy implements IAddress
 			
 			String st2 = "select street, city, state, zip, country from Address where addressId = ?;";
 			PreparedStatement ps2 = con.prepareStatement(st2);
+			ResultSet rs2;
+			
+			String st3 = "select e.address from Email e join PersonEmail pe on e.emailId = pe.emailId join Person p on p.personId = pe.personId where p.legacyId = ?;";
+			PreparedStatement ps3 = con.prepareStatement(st3);
+			ResultSet rs3;
 			
 			ResultSet rs = ps.getResultSet();
 			
@@ -177,13 +182,24 @@ public class Person extends Legacy implements IAddress
 				
 				ps2.setInt(1, rs.getInt("addressId"));
 				ps2.execute();
-				ResultSet rs2 = ps2.getResultSet();
+				rs2 = ps2.getResultSet();
 				rs2.next();
 				
 				StreetAddress sa = new StreetAddress(rs2.getString("street"), rs2.getString("city"), 
 						rs2.getString("state"), rs2.getString("zip"), rs2.getString("country"));
 				
 				Person p = new Person(rs.getString("legacyId"), rs.getString("firstName"), rs.getString("lastName"), type, sa);
+				
+				//Load emails for this person
+				
+				ps3.setString(1, p.getId());
+				ps3.execute();
+				rs3 = ps3.getResultSet();
+				
+				while (rs3.next()) {
+					p.addEmail(rs3.getString("address"));
+				}
+				
 				persons.add(p);
 			}
 			

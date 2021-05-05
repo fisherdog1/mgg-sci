@@ -34,22 +34,80 @@ public class SalesReport implements LegacyProvider
 		}
 	}
 	
-	//TODO: replace with sorted ADT
-	List<Legacy> all;
-	
-	public SalesReport() {
-		all = new ArrayList<Legacy>();
+	/**
+	 * Compares sales based on customer lastName, then firstName
+	 * @author azimuth
+	 *
+	 */
+	public static class SaleCustomerNameComparator implements Comparator<Sale>
+	{
+		@Override
+		public int compare(Sale o1, Sale o2)
+		{
+			int lastNameCmp = o1.getCustomer().getLastName().compareTo(o2.getCustomer().getLastName());
+			
+			if (lastNameCmp == 0)
+				return o1.getCustomer().getFirstName().compareTo(o2.getCustomer().getFirstName());
+			
+			return lastNameCmp;
+		}
 	}
 	
-	public void parseFile(CSVParser<? extends Legacy> parser, File in) {
-		all.addAll(parser.parse(in));
+	/**
+	 * Compares sales based on grand total. Sorts create a list of descending value
+	 * @author azimuth
+	 *
+	 */
+	public static class SaleValueComparator implements Comparator<Sale>
+	{
+		@Override
+		public int compare(Sale o1, Sale o2)
+		{
+			return o2.getGrandTotal() - o1.getGrandTotal();
+		}
+	}
+	
+	/**
+	 * Compares sales based on store name, then salesperson last name, first name
+	 * @author azimuth
+	 *
+	 */
+	public static class SaleStoreComparator implements Comparator<Sale>
+	{
+		@Override
+		public int compare(Sale o1, Sale o2)
+		{
+			int storeIdCmp = o1.getStore().compareTo(o2.getStore());
+			
+			if (storeIdCmp == 0) {
+				int lastNameCmp = o1.getSalesperson().getLastName().compareTo(o2.getSalesperson().getLastName());
+				
+				if (lastNameCmp == 0)
+					return o1.getSalesperson().getFirstName().compareTo(o2.getSalesperson().getFirstName());
+				
+				return lastNameCmp;
+			}
+			return storeIdCmp;
+		}
+	}
+	
+	List<Legacy> saleDependencies;
+	SortedLinkedList<Sale> sales;
+	
+	public SalesReport() {
+		saleDependencies = new ArrayList<Legacy>();
+		sales = new SortedLinkedList<Sale>(new SaleStoreComparator());
+	}
+	
+	public <T extends Legacy> List<T> parseFile(CSVParser<T> parser, File in) {
+		return parser.parse(in);
 	}
 	
 	public Legacy findById(String id) {
 		//TODO: binary search stopped working when SaleParser was changed??
 		//int i = Collections.binarySearch(all, new Legacy(id), new LegacyComparator());
 		
-		for (Legacy l : all) {
+		for (Legacy l : saleDependencies) {
 			if (l.getId().equals(id))
 				return l;
 		}
@@ -85,7 +143,7 @@ public class SalesReport implements LegacyProvider
 		List<SalespersonReportRow> rows = new ArrayList<SalespersonReportRow>();
 	
 		//TODO: make copy list of just people, also probably sales since those should change the most often
-		for (Legacy l : all) {
+		for (Legacy l : saleDependencies) {
 			if (l instanceof Person) {
 				Person p = (Person)l;
 				
@@ -94,34 +152,20 @@ public class SalesReport implements LegacyProvider
 			}
 		}
 		
-		//Sort rows by name
-		rows.sort(new Comparator<SalespersonReportRow>() {
-			@Override
-			public int compare(SalespersonReportRow a, SalespersonReportRow b) {
-				return a.salesperson.getFullNameFormal().compareTo(b.salesperson.getFullNameFormal());
-			}
-		});
-		
 		int totalSales = 0;
 		int grandTotalCents = 0;
 		
-		for (Legacy l : all) {
-			if (l instanceof Sale) {
-				Sale s = (Sale)l;
-				
-				for (SalespersonReportRow r : rows) {
-					if (r.salesperson.equals(s.getSalesperson())) {
-						r.sales++;
-						totalSales++;
-						
-						r.totalCents += s.getGrandTotal();
-						grandTotalCents += s.getGrandTotal();
-					}
+		for (Sale s : sales.getList()) {
+			for (SalespersonReportRow r : rows) {
+				if (r.salesperson.equals(s.getSalesperson())) {
+					r.sales++;
+					totalSales++;
+					
+					r.totalCents += s.getGrandTotal();
+					grandTotalCents += s.getGrandTotal();
 				}
 			}
 		}
-		
-		//rows.get(0).sales = 24;
 		
 		System.out.printf("%-24s %4s  %4s\n","Salesperson","# Sales","Grand Total");
 				
@@ -135,7 +179,7 @@ public class SalesReport implements LegacyProvider
 	public void storeSummaryReport() {
 		List<StoresReportRow> rows = new ArrayList<StoresReportRow>();
 		
-		for (Legacy l : all) {
+		for (Legacy l : saleDependencies) {
 			if (l instanceof Store) {
 				Store s = (Store)l;
 				
@@ -146,18 +190,14 @@ public class SalesReport implements LegacyProvider
 		int totalSales = 0;
 		int grandTotalCents = 0;
 
-		for (Legacy l : all) {
-			if (l instanceof Sale) {
-				Sale s = (Sale)l;
-				
-				for (StoresReportRow r : rows) {
-					if (r.store.equals(s.getStore())) {
-						r.sales++;
-						totalSales++;
-						
-						r.totalCents += s.getGrandTotal();
-						grandTotalCents += s.getGrandTotal();
-					}
+		for (Sale s : sales.getList()) {
+			for (StoresReportRow r : rows) {
+				if (r.store.equals(s.getStore())) {
+					r.sales++;
+					totalSales++;
+					
+					r.totalCents += s.getGrandTotal();
+					grandTotalCents += s.getGrandTotal();
 				}
 			}
 		}
@@ -173,82 +213,76 @@ public class SalesReport implements LegacyProvider
 	
 	//TODO: service cost per hour and item cost per unit output is wrong (actually total)
 	public void detailSaleReport() {
-		for (Legacy l : all) {
-			if (l instanceof Sale) {
-				Sale s = (Sale)l;
+		for (Sale s : sales.getList()) {
+			System.out.printf("Sale:  %s\n", s.getId());
+			System.out.printf("Store: %s\n", s.getStore().getId());
+			System.out.printf("Customer:\n");
+			System.out.printf("    %s (%s)\n", s.getCustomer().getFullNameFormal(), s.getCustomer().getEmail());
+			System.out.printf("    %s\n\n", s.getCustomer().getAddress());
+			
+			System.out.printf("Salesperson:\n");
+			System.out.printf("    %s (%s)\n", s.getSalesperson().getFullNameFormal(), s.getSalesperson().getEmail());
+			System.out.printf("    %s\n\n", s.getSalesperson().getAddress());
+			
+			int subtotal = s.getSubtotal();
+			int totalTax = s.getTax();
+			
+			for (Product si : s.getItems()) {
 				
-				System.out.printf("Sale:  %s\n", s.getId());
-				System.out.printf("Store: %s\n", s.getStore().getId());
-				System.out.printf("Customer:\n");
-				System.out.printf("    %s (%s)\n", s.getCustomer().getFullNameFormal(), s.getCustomer().getEmail());
-				System.out.printf("    %s\n\n", s.getCustomer().getAddress());
+				System.out.printf("%-48s\n", si.getName());
+				System.out.printf("%10s ", si.getId());
 				
-				System.out.printf("Salesperson:\n");
-				System.out.printf("    %s (%s)\n", s.getSalesperson().getFullNameFormal(), s.getSalesperson().getEmail());
-				System.out.printf("    %s\n\n", s.getSalesperson().getAddress());
+				String detail = "";
 				
-				int subtotal = s.getSubtotal();
-				int totalTax = s.getTax();
-				
-				for (Product si : s.getItems()) {
+				if (si instanceof Item) {
+					Item i = (Item)si;
 					
-					System.out.printf("%-48s\n", si.getName());
-					System.out.printf("%10s ", si.getId());
+					//TODO: move formatting to respective classes or make a builder class
 					
-					String detail = "";
-					
-					if (si instanceof Item) {
-						Item i = (Item)si;
-						
-						//TODO: move this?
-						//TODO: clean this for sure
-						
-						if (i.getProductType() == ProductType.New) {
-							int price = si.getBasePrice();
-							detail = "(New Item) @$%d.%02d/ea".formatted(price/100, price%100);
-						} else if (i.getProductType() == ProductType.Used) {
-							int price = (int)Math.round(si.getBasePrice()*0.8);
-							detail = "(Used Item) @$%d.%02d/ea".formatted(price/100, price%100);
-						} else if (i.getProductType() == ProductType.GiftCard) {
-							detail = "(Gift Card)";
-						}
-						
-					} else if (si instanceof Service) {
-						Service sv = (Service)si;
-						
+					if (i.getProductType() == ProductType.New) {
 						int price = si.getBasePrice();
-					
-						detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(sv.getSalesperson().getId(), sv.getSalesperson().getFullNameFormal(), price/100, price%100);
-						
-					} else if (si instanceof Subscription) {
-						Subscription sc = (Subscription)si;
-						
-						int days = sc.getDurationDays();
-						
-						detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getBasePrice()/100, sc.getBasePrice()%100);
-						
+						detail = "(New Item) @$%d.%02d/ea".formatted(price/100, price%100);
+					} else if (i.getProductType() == ProductType.Used) {
+						int price = (int)Math.round(si.getBasePrice()*0.8);
+						detail = "(Used Item) @$%d.%02d/ea".formatted(price/100, price%100);
+					} else if (i.getProductType() == ProductType.GiftCard) {
+						detail = "(Gift Card)";
 					}
 					
-					System.out.printf("%-64s $%4d.%02d\n",detail, si.getLineSubtotal()/100, si.getLineSubtotal()%100);
+				} else if (si instanceof Service) {
+					Service sv = (Service)si;
+					
+					int price = si.getBasePrice();
+				
+					detail = "(Svc by %s %s) @$%d.%02d/hr".formatted(sv.getSalesperson().getId(), sv.getSalesperson().getFullNameFormal(), price/100, price%100);
+					
+				} else if (si instanceof Subscription) {
+					Subscription sc = (Subscription)si;
+					
+					int days = sc.getDurationDays();
+					
+					detail = "Subscription for %d days @$%d.%02d/yr".formatted(days, sc.getBasePrice()/100, sc.getBasePrice()%100);
+					
 				}
 				
-				System.out.printf("%74s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
-				System.out.printf("%74s: $%4d.%02d\n", "Tax", totalTax/100, totalTax%100);
-
-				int discount = s.getSubtotalTax() - s.getGrandTotal();
-				if (s.getCustomer().getCustomerDiscount() > 0.0)
-					System.out.printf("%65s (%05.2f%%): $%4d.%02d\n", "Discount", s.getCustomer().getCustomerDiscount()*100, discount/100, discount%100);
-				System.out.printf("%74s: $%4d.%02d\n\n","Grand Total", s.getGrandTotal()/100, s.getGrandTotal()%100);
+				System.out.printf("%-64s $%4d.%02d\n",detail, si.getLineSubtotal()/100, si.getLineSubtotal()%100);
 			}
+			
+			System.out.printf("%74s: $%4d.%02d\n", "Subtotal", subtotal/100, subtotal%100);
+			System.out.printf("%74s: $%4d.%02d\n", "Tax", totalTax/100, totalTax%100);
+
+			int discount = s.getSubtotalTax() - s.getGrandTotal();
+			if (s.getCustomer().getCustomerDiscount() > 0.0)
+				System.out.printf("%65s (%05.2f%%): $%4d.%02d\n", "Discount", s.getCustomer().getCustomerDiscount()*100, discount/100, discount%100);
+			System.out.printf("%74s: $%4d.%02d\n\n","Grand Total", s.getGrandTotal()/100, s.getGrandTotal()%100);
 		}
 	}
 	
 	public void loadCSVs(String persons, String items, String stores, String sales) {
-		this.parseFile(new PersonParser(), new File(persons));
-		this.parseFile(new ProductParser(), new File(items));
-		this.parseFile(new StoreParser(this), new File(stores));
-		this.parseFile(new SaleParser(this), new File(sales));
-		this.all.sort(new LegacyComparator());
+		saleDependencies.addAll(parseFile(new PersonParser(), new File(persons)));
+		saleDependencies.addAll(parseFile(new ProductParser(), new File(items)));
+		saleDependencies.addAll(parseFile(new StoreParser(this), new File(stores)));
+		this.sales.addAll(parseFile(new SaleParser(this), new File(sales)));
 	}
 	
 	/**
@@ -256,7 +290,7 @@ public class SalesReport implements LegacyProvider
 	 */
 	public void commitExampleData() {
 		//TODO: Update to use ADT for dependency order sorting
-		for (Legacy l : all) {
+		for (Legacy l : saleDependencies) {
 			if (l instanceof Person) {
 				Person p = (Person)l;
 				StreetAddress sa = p.getAddress();
@@ -269,7 +303,7 @@ public class SalesReport implements LegacyProvider
 			}
 		}
 		
-		for (Legacy l : all) {
+		for (Legacy l : saleDependencies) {
 			if (l instanceof Store) {
 				Store s = (Store)l;
 				StreetAddress sa = s.getAddress();
@@ -279,7 +313,7 @@ public class SalesReport implements LegacyProvider
 			}
 		}
 		
-		for (Legacy l : all) {
+		for (Legacy l : saleDependencies) {
 			if (l instanceof Product) {
 				Product p = (Product)l;
 				if (p.isPrototype())
@@ -287,36 +321,29 @@ public class SalesReport implements LegacyProvider
 			}
 		}
 		
-		for (Legacy l : all) {
-			if (l instanceof Sale) {
-				Sale s = (Sale)l;
-				SalesData.addSale(s.getId(), s.getStore().getId(), s.getCustomer().getId(), s.getSalesperson().getId());
-			}
+		for (Sale s : sales.getList()) {
+			SalesData.addSale(s.getId(), s.getStore().getId(), s.getCustomer().getId(), s.getSalesperson().getId());
 		}
 		
-		for (Legacy l : all) {
-			if (l instanceof Sale) {
-				Sale s = (Sale)l;
-				
-				for (Product p : s.getItems()) {
-					if (!p.isPrototype()) {
-						if (p instanceof Item) {
-							Item i = (Item)p;
-							
-							if (i.getProductType() == ProductType.GiftCard)
-								SalesData.addGiftCardToSale(s.getId(), i.getId(), ((double)i.getBasePrice())/100.0); //function takes a dollars values basePrice is in cents
-							else
-								SalesData.addProductToSale(s.getId(), i.getId(), i.getQuantity());
-							
-						} else if (p instanceof Service) {
-							Service sv = (Service)p;
-							SalesData.addServiceToSale(s.getId(), sv.getId(), sv.getSalesperson().getId(), sv.getHours());
-							
-						} else if (p instanceof Subscription) {
-							Subscription sb = (Subscription)p;
-							SalesData.addSubscriptionToSale(s.getId(), sb.getId(), sb.getStartDate(), sb.getEndDate());
-							
-						}
+		for (Sale s : sales.getList()) {
+			for (Product p : s.getItems()) {
+				if (!p.isPrototype()) {
+					if (p instanceof Item) {
+						Item i = (Item)p;
+						
+						if (i.getProductType() == ProductType.GiftCard)
+							SalesData.addGiftCardToSale(s.getId(), i.getId(), ((double)i.getBasePrice())/100.0); //function takes a dollars values basePrice is in cents
+						else
+							SalesData.addProductToSale(s.getId(), i.getId(), i.getQuantity());
+						
+					} else if (p instanceof Service) {
+						Service sv = (Service)p;
+						SalesData.addServiceToSale(s.getId(), sv.getId(), sv.getSalesperson().getId(), sv.getHours());
+						
+					} else if (p instanceof Subscription) {
+						Subscription sb = (Subscription)p;
+						SalesData.addSubscriptionToSale(s.getId(), sb.getId(), sb.getStartDate(), sb.getEndDate());
+						
 					}
 				}
 			}
@@ -351,37 +378,24 @@ public class SalesReport implements LegacyProvider
 		//this.all.addAll(StreetAddress.loadAllFromDatabase());
 		
 		//Load Person, Store, Product, Sale
-		this.all.addAll(Person.loadAllFromDatabase());
-		this.all.addAll(Store.loadAllFromDatabase(this));
-		this.all.addAll(Item.loadAllFromDatabase());
-		this.all.addAll(Service.loadAllFromDatabase());
-		this.all.addAll(Subscription.loadAllFromDatabase());
-		this.all.addAll(Sale.loadAllFromDatabase(this));
+		this.saleDependencies.addAll(Person.loadAllFromDatabase());
+		this.saleDependencies.addAll(Store.loadAllFromDatabase(this));
+		this.saleDependencies.addAll(Item.loadAllFromDatabase());
+		this.saleDependencies.addAll(Service.loadAllFromDatabase());
+		this.saleDependencies.addAll(Subscription.loadAllFromDatabase());
+		this.saleDependencies.addAll(Sale.loadAllFromDatabase(this));
 	}
 	
 	public static void main(String[] args) {
 		
 		SalesReport sr = new SalesReport();
 		
-//		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
-//		
+		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
+	
 //		SalesData.clearDatabase();
 //		sr.commitExampleData();
 		
-		sr.loadAllFromDatabase();
-		
-//		SalesData.addPerson("00ff7f", "G", "Bobby", "Tables", "1337 Havey Avenue", "Cleveland", "OH", "44177", "US");
-//		SalesData.addEmail("00ff7f", "testemail2@gmail.com");
-//		SalesData.addStore("f6f6f6", "00ff7f", "162 Bobus", "Omaha", "Nebraska", "68111", "US");
-//		SalesData.addItem("foof70", "PN", "iPod Nano", 100.0);
-//		SalesData.addItem("foof50", "PU", "iPod Touch", 50.0);
-//		SalesData.addItem("foof20", "PG", "Fortnite $20", 0.0);
-//		SalesData.addItem("foof10", "SV", "Repair2", 20.0);
-//		SalesData.addItem("foof00", "SB", "NintendoPower2", 120.0);
-//		SalesData.addSale("ffffff", "f6f6f6", "00ff7f", "00ff7f");
-//		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 2.0);
-//		SalesData.addServiceToSale("ffffff", "foof10", "00ff7f", 1.5);
-//		SalesData.addSubscriptionToSale("ffffff", "foof00", "2015-01-20", "2016-01-01");
+//		sr.loadAllFromDatabase();
 		
 		sr.salespersonSummaryReport();
 		sr.storeSummaryReport();
