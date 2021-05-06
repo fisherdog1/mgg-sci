@@ -2,34 +2,51 @@ package com.mgg;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-public class SortedLinkedList<T>
+public class SortedLinkedList<T> implements Iterable<T>
 {
-	public class SLLNode<T>
+	public class SLLNode
 	{
+		private SLLNode(T item) {
+			this.value = item;
+		}
+		
 		private T value;
-		private SLLNode<T> next;
+		private SLLNode next;
+	}
+	
+	public class SortedLinkedListIterator implements Iterator<T>
+	{
+		SLLNode currentNode;
 		
-		public SLLNode(T value) {
-			this.value = value;
+		public SortedLinkedListIterator(SortedLinkedList<T> sortedLinkedList)
+		{
+			this.currentNode = sortedLinkedList.root;
 		}
-		
-		public SLLNode<T> getNext() {
-			return next;
+
+		@Override
+		public boolean hasNext()
+		{
+			return currentNode != null;
 		}
-		
-		public void setNext(SLLNode<T> next) {
-			this.next = next;
-		}
-		
-		public T getValue() {
-			return value;
+
+		@Override
+		public T next()
+		{
+			if (currentNode != null) {
+				T value = currentNode.value;
+				currentNode = currentNode.next;
+				return value;
+			} else
+				throw new NoSuchElementException("No more elements in SortedLinkedList");
 		}
 	}
 	
-	Comparator<T> comp;
-	SLLNode<T> root;
+	private Comparator<T> comp;
+	private SLLNode root;
 	
 	public SortedLinkedList(Comparator<T> comparator) {
 		this.comp = comparator;
@@ -48,54 +65,54 @@ public class SortedLinkedList<T>
 			return 0;
 		
 		
-		SLLNode<T> currentNode = root;
+		SLLNode currentNode = root;
 		int count = 0;
 		
 		do {
 			count++;
-		} while ((currentNode = currentNode.getNext()) != null);
+		} while ((currentNode = currentNode.next) != null);
 		
 		return count;
 	}
 	
 	public void add(T item) {
-		SLLNode<T> newNode = new SLLNode<T>(item);
+		SLLNode newNode = new SLLNode(item);
 		//Special case if root is null, can only insert at root
 		if (isEmpty()) {
 			root = newNode;
 			return;
 		}
 		
-		SLLNode<T> parentNode = null;
-		SLLNode<T> currentNode = root;
+		SLLNode parentNode = null;
+		SLLNode currentNode = root;
 		
 		//Go up the list until a higher value is found
 		while (true) {
 			//Parent node cannot be null here
 			//Reached end of list, must insert here
 			if (parentNode != null && currentNode == null) {
-				parentNode.setNext(newNode);
+				parentNode.next = newNode;
 				return;
 			}
 			
-			int cmp = comp.compare(currentNode.getValue(), item);
+			int cmp = comp.compare(currentNode.value, item);
 			
 			//Insert in the middle of the list here (between parent and current)
 			if (cmp >= 0) {
-				newNode.setNext(currentNode);
+				newNode.next = currentNode;
 				
 				//Special case where only the root is currently in the list
 				if (parentNode == null)
 					root = newNode;
 				else
-					parentNode.setNext(newNode);
+					parentNode.next = newNode;
 				
 				return;
 			}
 			
 			//Advance to next node
 			parentNode = currentNode;
-			currentNode = currentNode.getNext();
+			currentNode = currentNode.next;
 		}
 	}
 	
@@ -108,27 +125,27 @@ public class SortedLinkedList<T>
 		if (isEmpty())
 			return;
 		
-		SLLNode<T> parentNode = null;
-		SLLNode<T> currentNode = root;
+		SLLNode parentNode = null;
+		SLLNode currentNode = root;
 		
 		//Go up the list until the value is found
 		while (true) {
-			int cmp = comp.compare(currentNode.getValue(), item);
+			int cmp = comp.compare(currentNode.value, item);
 			
 			//Insert in the middle of the list here (between parent and current)
 			if (cmp == 0) {
 				//Special case for removing the root
 				if (parentNode == null)
-					root = root.getNext();
+					root = root.next;
 				else
-					parentNode.setNext(currentNode.getNext());
+					parentNode.next = currentNode.next;
 				
 				return;
 			}
 			
 			//Advance to next node
 			parentNode = currentNode;
-			currentNode = currentNode.getNext();
+			currentNode = currentNode.next;
 		}
 	}
 	
@@ -139,42 +156,28 @@ public class SortedLinkedList<T>
 	public ArrayList<T> getList() {
 		ArrayList<T> list = new ArrayList<T>();
 		
-		if (isEmpty())
-			return list;
-		
-		SLLNode<T> currentNode = root;
-		
-		do {
-			list.add(currentNode.getValue());
-		} while ((currentNode = currentNode.getNext()) != null);
+		for (T item : this)
+			list.add(item);
 		
 		return list;
 	}
 	
 	/**
-	 * Misc tests for SortedLinkedList
+	 * Change the comparator. The list is re-sorted immediately.
+	 * @param cmp
 	 */
-	public void SLLTest() {
-		Comparator<Integer> cmp = new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) { return o1-o2; }
-		};
+	public void setComparator(Comparator<T> cmp) {
+		ArrayList<T> tmp = getList();
+		this.comp = cmp;
+		clear();
 		
-		SortedLinkedList<Integer> sll = new SortedLinkedList<Integer>(cmp);
-		
-		sll.add(5);
-		sll.add(4);
-		sll.add(3);
-		sll.add(4);
-		sll.add(5);
-		
-		for (Integer i : sll.getList())
-			System.out.printf("%d\n", i);
-		
-		System.out.printf("Count: %d\n", sll.count());
-		sll.remove(3);
-		
-		for (Integer i : sll.getList())
-			System.out.printf("%d\n", i);
+		for (T item : tmp)
+			this.add(item);
+	}
+
+	@Override
+	public Iterator<T> iterator()
+	{
+		return new SortedLinkedListIterator(this);
 	}
 }

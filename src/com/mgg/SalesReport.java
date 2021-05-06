@@ -155,7 +155,7 @@ public class SalesReport implements LegacyProvider
 		int totalSales = 0;
 		int grandTotalCents = 0;
 		
-		for (Sale s : sales.getList()) {
+		for (Sale s : sales) {
 			for (SalespersonReportRow r : rows) {
 				if (r.salesperson.equals(s.getSalesperson())) {
 					r.sales++;
@@ -190,7 +190,7 @@ public class SalesReport implements LegacyProvider
 		int totalSales = 0;
 		int grandTotalCents = 0;
 
-		for (Sale s : sales.getList()) {
+		for (Sale s : sales) {
 			for (StoresReportRow r : rows) {
 				if (r.store.equals(s.getStore())) {
 					r.sales++;
@@ -213,7 +213,7 @@ public class SalesReport implements LegacyProvider
 	
 	//TODO: service cost per hour and item cost per unit output is wrong (actually total)
 	public void detailSaleReport() {
-		for (Sale s : sales.getList()) {
+		for (Sale s : sales) {
 			System.out.printf("Sale:  %s\n", s.getId());
 			System.out.printf("Store: %s\n", s.getStore().getId());
 			System.out.printf("Customer:\n");
@@ -321,11 +321,11 @@ public class SalesReport implements LegacyProvider
 			}
 		}
 		
-		for (Sale s : sales.getList()) {
+		for (Sale s : sales) {
 			SalesData.addSale(s.getId(), s.getStore().getId(), s.getCustomer().getId(), s.getSalesperson().getId());
 		}
 		
-		for (Sale s : sales.getList()) {
+		for (Sale s : sales) {
 			for (Product p : s.getItems()) {
 				if (!p.isPrototype()) {
 					if (p instanceof Item) {
