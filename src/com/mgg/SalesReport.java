@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
+
+import com.mgg.ReportColumn.ReportColumnIterator;
 
 /**
  * Sales report generator, loads and associates Legacy entities (Store,Person,etc)
@@ -383,22 +386,32 @@ public class SalesReport implements LegacyProvider
 		this.saleDependencies.addAll(Item.loadAllFromDatabase());
 		this.saleDependencies.addAll(Service.loadAllFromDatabase());
 		this.saleDependencies.addAll(Subscription.loadAllFromDatabase());
-		this.saleDependencies.addAll(Sale.loadAllFromDatabase(this));
+		
+		//Ideally saleDependencies could be discarded after this point
+		this.sales.addAll(Sale.loadAllFromDatabase(this));
 	}
 	
 	public static void main(String[] args) {
 		
 		SalesReport sr = new SalesReport();
 		
-		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
-	
+		//Load database with data from CSVs for testing
+//		sr.loadCSVs("data/Persons.csv", "data/Items.csv", "data/Stores.csv", "data/Sales.csv");
 //		SalesData.clearDatabase();
 //		sr.commitExampleData();
 		
-//		sr.loadAllFromDatabase();
+		sr.loadAllFromDatabase();
 		
 		sr.salespersonSummaryReport();
 		sr.storeSummaryReport();
 		sr.detailSaleReport();
+		
+		//These also work but DetailReport is not finished
+//		ReportBuilder rb1 = ReportBuilder.salespersonSummaryReportBuilder(sr.sales, sr.saleDependencies);
+//		ReportBuilder rb2 = ReportBuilder.storeSummaryReportBuilder(sr.saleDependencies,sr.sales);
+		
+//		System.out.print(rb1);
+//		System.out.print(rb2);
 	}
 }
+
