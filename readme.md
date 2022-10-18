@@ -5,4 +5,4 @@
 Create a sales system for the hypothetical Modern Geeks Gaming franchise.
 
 # Authors
-Aaron Linnell: alinnell, 06623922, aaronlinnell@gmail.com
+(Personal info was here)
